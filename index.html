@@ -119,6 +119,13 @@ body{font-family:'DM Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min-heigh
     </div>
   </div>
   <div class="sync-bar" id="sync-bar"></div>
+  <div id="sync-errors"></div>
+  <div id="debug-panel" style="display:none;background:#1a1a1a;color:#00ff88;font-family:monospace;font-size:11px;padding:10px 12px;border-radius:10px;margin-bottom:12px;max-height:180px;overflow-y:auto;white-space:pre-wrap;word-break:break-all"></div>
+  <div style="margin-bottom:12px;display:flex;gap:6px">
+    <button onclick="toggleDebug()" id="debug-btn" style="font-size:11px;color:#aaa;background:#fff;border:1px solid #e0dbd3;border-radius:8px;padding:4px 10px;cursor:pointer;font-family:'DM Sans',sans-serif">Debug</button>
+    <button onclick="runCalDiag()" style="font-size:11px;color:#aaa;background:#fff;border:1px solid #e0dbd3;border-radius:8px;padding:4px 10px;cursor:pointer;font-family:'DM Sans',sans-serif">List all calendars</button>
+    <button onclick="reSync()" style="font-size:11px;color:#aaa;background:#fff;border:1px solid #e0dbd3;border-radius:8px;padding:4px 10px;cursor:pointer;font-family:'DM Sans',sans-serif">Re-sync</button>
+  </div>
   <div class="nav">
     <button class="nav-tab active" onclick="switchTab('today')">Today</button>
     <button class="nav-tab" onclick="switchTab('chat')">Chat</button>
@@ -204,11 +211,12 @@ async function syncCalendar(){
     const now=new Date().toISOString();
     const future=new Date(Date.now()+90*864e5).toISOString();
 
-    // Step 1: get ALL calendars the user has access to
-    const calListR=await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList',{headers:{Authorization:'Bearer '+t}});
+    // Step 1: get ALL calendars including shared ones
+    const calListR=await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=reader&showHidden=true',{headers:{Authorization:'Bearer '+t}});
     const calListD=await calListR.json();
     if(calListD.error) throw new Error(calListD.error.message+' ['+calListD.error.code+']');
-    const calendars=(calListD.items||[]).filter(c=>c.accessRole==='owner'||c.accessRole==='writer'||c.accessRole==='reader');
+    const calendars=(calListD.items||[]);
+    calendars.forEach(c=>dbg('  Cal: ['+c.accessRole+'] '+c.summary+' | '+c.id));
 
     // Step 2: fetch events from each calendar
     const allItems=[];
@@ -216,7 +224,7 @@ async function syncCalendar(){
       try{
         const r=await fetch(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?timeMin=${now}&timeMax=${future}&singleEvents=true&orderBy=startTime&maxResults=50`,{headers:{Authorization:'Bearer '+t}});
         const d=await r.json();
-        if(d.error){console.warn('Skipping calendar',cal.summary,d.error.message);continue;}
+        if(d.error){dbg('  Skip '+cal.summary+': '+d.error.message);continue;}
         const events=(d.items||[]).filter(e=>e.status!=='cancelled'&&e.summary).map(e=>{
           const start=e.start.dateTime||e.start.date||'';
           const timeStr=e.start.dateTime?new Date(e.start.dateTime).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'';
@@ -234,7 +242,8 @@ async function syncCalendar(){
     liveItems=liveItems.filter(i=>i.source!=='google_calendar');
     liveItems.push(...unique);
     syncSt.calendar='ok';syncSt.calCount=unique.length;updateSyncBar();
-  } catch(e){syncSt.calendar='error';syncSt.calErr=e.message;updateSyncBar();console.error('Calendar:',e.message);}
+    dbg('Calendar sync OK: '+unique.length+' events');
+  } catch(e){syncSt.calendar='error';syncSt.calErr=e.message;updateSyncBar();dbg('Calendar ERROR: '+e.message);}
 }
 
 async function syncTasks(){
@@ -254,7 +263,8 @@ async function syncTasks(){
     }
     liveItems=liveItems.filter(i=>i.source!=='google_tasks');liveItems.push(...items);
     syncSt.tasks='ok';syncSt.taskCount=items.length;updateSyncBar();
-  } catch(e){syncSt.tasks='error';syncSt.taskErr=e.message;updateSyncBar();console.error('Tasks:',e.message);}
+    dbg('Tasks sync OK: '+items.length+' tasks');
+  } catch(e){syncSt.tasks='error';syncSt.taskErr=e.message;updateSyncBar();dbg('Tasks ERROR: '+e.message);}
 }
 
 function allItems(){
@@ -503,6 +513,50 @@ async function sendMessage(){
   document.getElementById('send-btn').disabled=false;inp.focus();
 }
 
+let debugLog=[];
+function dbg(msg){
+  debugLog.push(new Date().toLocaleTimeString()+': '+msg);
+  const el=document.getElementById('debug-panel');
+  if(el&&el.style.display!=='none'){el.textContent=debugLog.slice(-30).join('
+');}
+  console.log(msg);
+}
+
+function toggleDebug(){
+  const el=document.getElementById('debug-panel');
+  const btn=document.getElementById('debug-btn');
+  const show=el.style.display==='none';
+  el.style.display=show?'block':'none';
+  btn.textContent=show?'Hide debug':'Debug';
+  if(show)el.textContent=debugLog.slice(-30).join('
+')||'No debug info yet. Try Re-sync.';
+}
+
+async function runCalDiag(){
+  dbg('--- Calendar diagnostic ---');
+  try{
+    const t=await getToken();dbg('Token OK');
+    const r=await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList?minAccessRole=reader&showHidden=true',{headers:{Authorization:'Bearer '+t}});
+    const d=await r.json();
+    if(d.error){dbg('ERROR: '+d.error.message);return;}
+    dbg('Found '+d.items.length+' calendars:');
+    (d.items||[]).forEach(c=>dbg('  ['+c.accessRole+'] '+c.summary+' | id: '+c.id));
+  }catch(e){dbg('Exception: '+e.message);}
+  const el=document.getElementById('debug-panel');
+  el.style.display='block';el.textContent=debugLog.slice(-30).join('
+');
+  document.getElementById('debug-btn').textContent='Hide debug';
+}
+
+async function reSync(){
+  dbg('--- Re-syncing ---');
+  await Promise.all([syncCalendar(),syncTasks()]);
+  renderAllItems();
+  const urgent=allItems().filter(i=>i.status!=='done'&&i.dueDate&&days(i.dueDate)!==null&&days(i.dueDate)<=14).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+  renderUpcoming(urgent);
+  dbg('Re-sync complete. Calendar: '+syncSt.calCount+' Tasks: '+syncSt.taskCount);
+}
+
 async function startSetup(){
   const btn=document.getElementById('setup-btn');const err=document.getElementById('setup-error');
   err.style.display='none';
@@ -511,6 +565,8 @@ async function startSetup(){
   cfg.secret=document.getElementById('cfg-secret').value.trim();
   cfg.refresh=document.getElementById('cfg-refresh').value.trim();
   cfg.anthropic=document.getElementById('cfg-anthropic').value.trim();
+  // Save credentials so user doesn't retype them on reload
+  try{localStorage.setItem('mlo-cfg',JSON.stringify({sheetId:cfg.sheetId,clientId:cfg.clientId,secret:cfg.secret,refresh:cfg.refresh,anthropic:cfg.anthropic}));}catch(e){}
   if(!cfg.sheetId||!cfg.clientId||!cfg.secret||!cfg.refresh||!cfg.anthropic){err.textContent='Please fill in all fields.';err.style.display='block';return;}
   btn.disabled=true;btn.textContent='Connecting...';
   try{
@@ -529,6 +585,35 @@ async function startSetup(){
 }
 
 function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+name).classList.add('active');}
+
+function restoreCreds(){
+  try{
+    const saved=localStorage.getItem('mlo-cfg');
+    if(!saved)return;
+    const c=JSON.parse(saved);
+    if(c.sheetId)document.getElementById('cfg-sheet').value=c.sheetId;
+    if(c.clientId)document.getElementById('cfg-client-id').value=c.clientId;
+    if(c.secret)document.getElementById('cfg-secret').value=c.secret;
+    if(c.refresh)document.getElementById('cfg-refresh').value=c.refresh;
+    if(c.anthropic)document.getElementById('cfg-anthropic').value=c.anthropic;
+    if(c.sheetId&&c.clientId&&c.secret&&c.refresh&&c.anthropic){
+      document.getElementById('setup-btn').textContent='Reconnect →';
+      // Show auto-restore notice
+      const note=document.createElement('div');
+      note.style.cssText='background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center';
+      note.innerHTML='Credentials restored from last session. <button onclick="clearCreds()" style="font-size:12px;background:none;border:none;color:#991b1b;cursor:pointer;font-family:inherit">Clear</button>';
+      document.getElementById('setup-error').before(note);
+    }
+  }catch(e){}
+}
+
+function clearCreds(){
+  try{localStorage.removeItem('mlo-cfg');}catch(e){}
+  location.reload();
+}
+
+// Restore on load
+window.addEventListener('DOMContentLoaded',restoreCreds);
 
 function switchTab(name){
   document.querySelectorAll('.nav-tab').forEach((t,i)=>t.classList.toggle('active',['today','chat','items','profile'][i]===name));
