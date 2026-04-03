@@ -204,7 +204,7 @@ async function syncCalendar(){
     const now=new Date().toISOString();
     const future=new Date(Date.now()+90*864e5).toISOString();
     const r=await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${now}&timeMax=${future}&singleEvents=true&orderBy=startTime&maxResults=50`,{headers:{Authorization:'Bearer '+t}});
-    const d=await r.json();if(d.error)throw new Error(d.error.message);
+    const d=await r.json();if(d.error)throw new Error(d.error.message+' ['+d.error.code+'] reason:'+(d.error.errors&&d.error.errors[0]?d.error.errors[0].reason:'?'));
     const items=(d.items||[]).filter(e=>e.status!=='cancelled'&&e.summary).map(e=>{
       const start=e.start.dateTime||e.start.date||'';
       const timeStr=e.start.dateTime?new Date(e.start.dateTime).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'';
@@ -212,7 +212,7 @@ async function syncCalendar(){
     });
     liveItems=liveItems.filter(i=>i.source!=='google_calendar');liveItems.push(...items);
     syncSt.calendar='ok';syncSt.calCount=items.length;updateSyncBar();
-  } catch(e){syncSt.calendar='error';syncSt.calErr=e.message;updateSyncBar();}
+  } catch(e){syncSt.calendar='error';syncSt.calErr=e.message;updateSyncBar();console.error('Calendar:',e.message);}
 }
 
 async function syncTasks(){
@@ -232,7 +232,7 @@ async function syncTasks(){
     }
     liveItems=liveItems.filter(i=>i.source!=='google_tasks');liveItems.push(...items);
     syncSt.tasks='ok';syncSt.taskCount=items.length;updateSyncBar();
-  } catch(e){syncSt.tasks='error';syncSt.taskErr=e.message;updateSyncBar();}
+  } catch(e){syncSt.tasks='error';syncSt.taskErr=e.message;updateSyncBar();console.error('Tasks:',e.message);}
 }
 
 function allItems(){
@@ -348,12 +348,21 @@ function clean(t){return t.replace(/<ACTION>[\s\S]*?<\/ACTION>/g,'').trim();}
 
 function updateSyncBar(){
   const bar=document.getElementById('sync-bar');if(!bar)return;
-  const pill=(label,cls)=>`<div class="sync-pill ${cls}"><span class="sdot"></span>${label}</div>`;
+  const pill=(label,cls,title)=>`<div class="sync-pill ${cls}" title="${title||''}" style="cursor:${title?'help':'default'}"><span class="sdot"></span>${label}</div>`;
   const sc={ok:'ok',pending:'syncing',syncing:'syncing',error:'error'};
+  const calLabel=syncSt.calendar==='ok'?'Calendar ('+syncSt.calCount+')':syncSt.calendar==='error'?'Calendar error':'Calendar…';
+  const taskLabel=syncSt.tasks==='ok'?'Tasks ('+syncSt.taskCount+')':syncSt.tasks==='error'?'Tasks error':'Tasks…';
   bar.innerHTML=
-    pill('Sheets '+(syncSt.sheets==='ok'?'✓':'…'),sc[syncSt.sheets]||'syncing')+
-    pill('Calendar '+(syncSt.calendar==='ok'?'('+syncSt.calCount+')':syncSt.calendar==='error'?'error':'…'),sc[syncSt.calendar]||'syncing')+
-    pill('Tasks '+(syncSt.tasks==='ok'?'('+syncSt.taskCount+')':syncSt.tasks==='error'?'error':'…'),sc[syncSt.tasks]||'syncing');
+    pill('Sheets '+(syncSt.sheets==='ok'?'✓':'…'),sc[syncSt.sheets]||'syncing',syncSt.sheetsErr||'')+
+    pill(calLabel,sc[syncSt.calendar]||'syncing',syncSt.calErr||'')+
+    pill(taskLabel,sc[syncSt.tasks]||'syncing',syncSt.taskErr||'');
+  // Show errors below bar
+  let errHtml='';
+  if(syncSt.calendar==='error')errHtml+=`<div style="font-size:12px;color:#991b1b;margin-bottom:4px;padding:6px 10px;background:#fef2f2;border-radius:8px">Calendar: ${syncSt.calErr}</div>`;
+  if(syncSt.tasks==='error')errHtml+=`<div style="font-size:12px;color:#991b1b;padding:6px 10px;background:#fef2f2;border-radius:8px">Tasks: ${syncSt.taskErr}</div>`;
+  let errEl=document.getElementById('sync-errors');
+  if(!errEl){errEl=document.createElement('div');errEl.id='sync-errors';bar.parentNode.insertBefore(errEl,bar.nextSibling);}
+  errEl.innerHTML=errHtml;
 }
 
 function days(ds){
