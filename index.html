@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Life Organizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min-height:100vh}
+.wrap{max-width:600px;margin:0 auto;padding:1.5rem 1rem 4rem}
+
+/* SETUP */
+.setup-logo{font-family:'Playfair Display',serif;font-size:34px;font-weight:400;margin-bottom:4px}
+.setup-logo em{font-style:italic;color:#555}
+.setup-sub{font-size:13px;color:#888;margin-bottom:2rem}
+.card{background:#fff;border:1px solid #e8e4dd;border-radius:16px;padding:1.25rem 1.5rem;margin-bottom:12px}
+.card h3{font-size:11px;font-weight:500;color:#999;letter-spacing:.07em;text-transform:uppercase;margin-bottom:1rem}
+.field{margin-bottom:11px}
+.field label{display:block;font-size:12px;font-weight:500;color:#666;margin-bottom:4px}
+.field input{width:100%;font-size:14px;font-family:'DM Sans',sans-serif;padding:9px 12px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;outline:none}
+.field input:focus{border-color:#888}
+.field .hint{font-size:11px;color:#bbb;margin-top:3px;line-height:1.4}
+.btn-primary{width:100%;padding:12px;font-size:14px;font-weight:500;font-family:'DM Sans',sans-serif;background:#1a1a1a;color:#fff;border:none;border-radius:10px;cursor:pointer;transition:opacity .15s}
+.btn-primary:hover{opacity:.85}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.setup-note{font-size:11px;color:#aaa;text-align:center;margin-top:10px;line-height:1.5}
+.error-msg{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:12px}
+
+/* APP HEADER */
+.app-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.app-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:400}
+.app-logo em{font-style:italic;color:#666}
+.settings-btn{font-size:12px;color:#999;background:#fff;border:1px solid #e0dbd3;border-radius:8px;padding:5px 11px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.conn-status{font-size:12px;color:#888;display:flex;align-items:center;gap:5px}
+.conn-dot{width:7px;height:7px;border-radius:50%;background:#22c55e}
+.conn-dot.red{background:#ef4444}
+
+/* NAV */
+.nav{display:flex;gap:2px;background:#ede9e2;border-radius:10px;padding:3px;margin-bottom:1.25rem}
+.nav-tab{flex:1;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;color:#777;background:none;border:none;padding:7px 4px;border-radius:7px;cursor:pointer;transition:all .15s;text-align:center}
+.nav-tab.active{background:#fff;color:#1a1a1a;box-shadow:0 1px 4px rgba(0,0,0,.09)}
+
+/* BRIEFING */
+.briefing{background:#fff;border:1px solid #e8e4dd;border-radius:14px;padding:1.1rem 1.35rem;margin-bottom:1rem;font-size:14px;line-height:1.65;color:#555}
+.briefing.loading{color:#aaa;font-style:italic}
+.briefing-head{font-family:'Playfair Display',serif;font-size:17px;color:#1a1a1a;margin-bottom:6px;font-weight:400}
+
+/* ITEMS */
+.section-label{font-size:11px;font-weight:500;color:#aaa;letter-spacing:.07em;text-transform:uppercase;margin:1.1rem 0 7px}
+.item-card{background:#fff;border:1px solid #e8e4dd;border-radius:14px;padding:.9rem 1.1rem;margin-bottom:8px;display:flex;align-items:flex-start;gap:11px}
+.item-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.icon-task{background:#eeecfe;color:#4f46e5}
+.icon-birthday{background:#fce7f3;color:#be185d}
+.icon-appointment{background:#dbeafe;color:#1d4ed8}
+.icon-recurring{background:#dcfce7;color:#166534}
+.item-title{font-size:14px;font-weight:500;color:#1a1a1a;line-height:1.3}
+.item-meta{font-size:12px;color:#aaa;margin-top:2px}
+.item-badges{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px}
+.badge-urgent{background:#fef2f2;color:#991b1b}
+.badge-soon{background:#fffbeb;color:#92400e}
+.badge-ok{background:#f0fdf4;color:#166534}
+.badge-type{background:#f5f5f5;color:#666}
+.empty{text-align:center;padding:2.5rem 1rem;color:#bbb;font-size:14px}
+
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;gap:10px;min-height:200px;margin-bottom:12px}
+.bubble{max-width:88%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.55}
+.bubble.user{align-self:flex-end;background:#1a1a1a;color:#fff;border-bottom-right-radius:4px}
+.bubble.ai{align-self:flex-start;background:#fff;color:#1a1a1a;border:1px solid #e8e4dd;border-bottom-left-radius:4px}
+.bubble.ai.thinking{color:#bbb;font-style:italic}
+.chat-input-row{display:flex;gap:8px}
+.chat-input{flex:1;font-size:14px;font-family:'DM Sans',sans-serif;padding:10px 14px;border:1px solid #ddd;border-radius:14px;background:#fff;color:#1a1a1a;outline:none}
+.chat-input:focus{border-color:#999}
+.send-btn{font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;padding:10px 16px;background:#1a1a1a;color:#fff;border:none;border-radius:14px;cursor:pointer}
+.send-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* PROFILE */
+.profile-card{background:#fff;border:1px solid #e8e4dd;border-radius:14px;padding:1rem 1.25rem;margin-bottom:10px}
+.profile-card h4{font-size:11px;font-weight:500;color:#aaa;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.pkv{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0ede8;font-size:13px}
+.pkv:last-child{border-bottom:none}
+.pk{color:#888}.pv{color:#1a1a1a;font-weight:500;text-align:right;max-width:60%}
+
+.screen{display:none}.screen.active{display:block}
+.tab-panel{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- SETUP SCREEN -->
+<div id="screen-setup" class="screen active">
+  <div class="setup-logo">My Life <em>Organizer</em></div>
+  <div class="setup-sub">Powered by Claude · Backed by Google Sheets</div>
+
+  <div class="card">
+    <h3>Google Sheets credentials</h3>
+    <div class="field">
+      <label>Sheet ID</label>
+      <input id="cfg-sheet" type="text" placeholder="1PsLFRjGvsFfTrcKyw..." autocomplete="off"/>
+      <div class="hint">From your Google Sheets URL: /spreadsheets/d/<strong>THIS_PART</strong>/edit</div>
+    </div>
+    <div class="field">
+      <label>Client ID</label>
+      <input id="cfg-client-id" type="text" placeholder="794042381190-..." autocomplete="off"/>
+    </div>
+    <div class="field">
+      <label>Client Secret</label>
+      <input id="cfg-secret" type="password" placeholder="GOCSPX-..." autocomplete="off"/>
+    </div>
+    <div class="field">
+      <label>Refresh Token</label>
+      <input id="cfg-refresh" type="password" placeholder="1//04OOf7ANV..." autocomplete="off"/>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Anthropic API key</h3>
+    <div class="field">
+      <label>API Key</label>
+      <input id="cfg-anthropic" type="password" placeholder="sk-ant-..." autocomplete="off"/>
+      <div class="hint">Get yours at console.anthropic.com · Usage billed to your account</div>
+    </div>
+  </div>
+
+  <div id="setup-error" class="error-msg" style="display:none"></div>
+  <button class="btn-primary" id="setup-btn" onclick="startSetup()">Connect & Start →</button>
+  <div class="setup-note">Credentials are stored only in this browser session and sent only to Google and Anthropic directly.</div>
+</div>
+
+<!-- MAIN APP -->
+<div id="screen-app" class="screen">
+  <div class="app-header">
+    <div class="app-logo">My Life <em>Organizer</em></div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div class="conn-status"><span class="conn-dot" id="conn-dot"></span><span id="conn-label">Connected</span></div>
+      <button class="settings-btn" onclick="showScreen('setup')">Settings</button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-tab active" onclick="switchTab('today')">Today</button>
+    <button class="nav-tab" onclick="switchTab('chat')">Chat</button>
+    <button class="nav-tab" onclick="switchTab('items')">All Items</button>
+    <button class="nav-tab" onclick="switchTab('profile')">Profile</button>
+  </div>
+
+  <!-- TODAY -->
+  <div id="tab-today" class="tab-panel" style="display:block">
+    <div id="briefing" class="briefing loading">Checking what needs your attention today...</div>
+    <div id="upcoming-list"></div>
+  </div>
+
+  <!-- CHAT -->
+  <div id="tab-chat" class="tab-panel">
+    <div class="chat-wrap" id="chat-messages"></div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chat-input" placeholder="Tell me anything — tasks, birthdays, appointments..." onkeydown="if(event.key==='Enter')sendMessage()"/>
+      <button class="send-btn" id="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <!-- ALL ITEMS -->
+  <div id="tab-items" class="tab-panel">
+    <div id="all-items-list"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div id="tab-profile" class="tab-panel">
+    <div id="profile-view"></div>
+  </div>
+</div>
+
+</div>
+<script>
+// ── CONFIG & STATE ─────────────────────────────────────
+let cfg={sheetId:'',clientId:'',secret:'',refresh:'',anthropic:'',accessToken:'',tokenExpiry:0};
+let appData={profile:{},items:[],people:[],memoryLog:[],chatHistory:[]};
+
+// ── GOOGLE OAUTH ───────────────────────────────────────
+async function getAccessToken(){
+  if(cfg.accessToken&&Date.now()<cfg.tokenExpiry) return cfg.accessToken;
+  const r=await fetch('https://oauth2.googleapis.com/token',{
+    method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
+    body:`client_id=${encodeURIComponent(cfg.clientId)}&client_secret=${encodeURIComponent(cfg.secret)}&refresh_token=${encodeURIComponent(cfg.refresh)}&grant_type=refresh_token`
+  });
+  const d=await r.json();
+  if(!d.access_token) throw new Error('Token refresh failed: '+(d.error_description||d.error||'unknown'));
+  cfg.accessToken=d.access_token;
+  cfg.tokenExpiry=Date.now()+(d.expires_in-60)*1000;
+  return cfg.accessToken;
+}
+
+// ── SHEETS HELPERS ─────────────────────────────────────
+async function sheetsGet(range){
+  const tok=await getAccessToken();
+  const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${encodeURIComponent(range)}`,{headers:{Authorization:'Bearer '+tok}});
+  const d=await r.json();
+  if(d.error) throw new Error(d.error.message);
+  return d.values||[];
+}
+async function sheetsUpdate(range,values){
+  const tok=await getAccessToken();
+  const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${encodeURIComponent(range)}?valueInputOption=RAW`,{
+    method:'PUT',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},
+    body:JSON.stringify({range,majorDimension:'ROWS',values})
+  });
+  const d=await r.json();
+  if(d.error) throw new Error(d.error.message);
+}
+async function sheetsAppend(range,values){
+  const tok=await getAccessToken();
+  const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${encodeURIComponent(range)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,{
+    method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},
+    body:JSON.stringify({range,majorDimension:'ROWS',values})
+  });
+  const d=await r.json();
+  if(d.error) throw new Error(d.error.message);
+}
+
+// ── INIT SHEETS ────────────────────────────────────────
+async function initSheets(){
+  const tok=await getAccessToken();
+  const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}`,{headers:{Authorization:'Bearer '+tok}});
+  const meta=await r.json();
+  if(meta.error) throw new Error(meta.error.message);
+  const existing=meta.sheets.map(s=>s.properties.title);
+  const needed=['Profile','Items','People','MemoryLog'];
+  const toCreate=needed.filter(n=>!existing.includes(n));
+  if(toCreate.length){
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}:batchUpdate`,{
+      method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},
+      body:JSON.stringify({requests:toCreate.map(title=>({addSheet:{properties:{title}}}))})
+    });
+  }
+  // Seed headers
+  const items=await sheetsGet('Items!A1:A1');
+  if(!items.length||!items[0][0]) await sheetsUpdate('Items!A1:J1',[['ID','Title','Type','DueDate','Recurrence','RecurrenceInterval','Status','Priority','Notes','Source']]);
+  const prof=await sheetsGet('Profile!A1:A1');
+  if(!prof.length||!prof[0][0]) await sheetsUpdate('Profile!A1:B1',[['Key','Value']]);
+  const ppl=await sheetsGet('People!A1:A1');
+  if(!ppl.length||!ppl[0][0]) await sheetsUpdate('People!A1:E1',[['Name','Relationship','Birthday','Notes','Source']]);
+  const mem=await sheetsGet('MemoryLog!A1:A1');
+  if(!mem.length||!mem[0][0]) await sheetsUpdate('MemoryLog!A1:D1',[['Timestamp','Learned','Confidence','Source']]);
+}
+
+// ── LOAD DATA ──────────────────────────────────────────
+async function loadAllData(){
+  const rows=await sheetsGet('Items!A2:J1000');
+  appData.items=rows.filter(r=>r[0]).map(r=>({id:r[0],title:r[1]||'',type:r[2]||'task',dueDate:r[3]||'',recurrence:r[4]||'none',recurrenceInterval:r[5]||'',status:r[6]||'pending',priority:r[7]||'medium',notes:r[8]||'',source:r[9]||'chat'}));
+  const pr=await sheetsGet('Profile!A2:B1000');
+  appData.profile={};
+  pr.filter(r=>r[0]).forEach(r=>{appData.profile[r[0]]=r[1]||'';});
+  const pp=await sheetsGet('People!A2:E1000');
+  appData.people=pp.filter(r=>r[0]).map(r=>({name:r[0],relationship:r[1]||'',birthday:r[2]||'',notes:r[3]||'',source:r[4]||''}));
+  const ml=await sheetsGet('MemoryLog!A2:D500');
+  appData.memoryLog=ml.filter(r=>r[0]).map(r=>({timestamp:r[0],learned:r[1],confidence:r[2],source:r[3]}));
+}
+
+// ── SAVE HELPERS ───────────────────────────────────────
+async function saveItem(item){
+  const idx=appData.items.findIndex(i=>i.id===item.id);
+  if(idx>=0){
+    appData.items[idx]=item;
+    await sheetsUpdate(`Items!A${idx+2}:J${idx+2}`,[[item.id,item.title,item.type,item.dueDate,item.recurrence,item.recurrenceInterval,item.status,item.priority,item.notes,item.source]]);
+  } else {
+    appData.items.push(item);
+    await sheetsAppend('Items!A:J',[[item.id,item.title,item.type,item.dueDate,item.recurrence,item.recurrenceInterval,item.status,item.priority,item.notes,item.source]]);
+  }
+}
+async function saveProfileKey(key,value){
+  appData.profile[key]=value;
+  const pr=await sheetsGet('Profile!A2:B1000');
+  const idx=pr.findIndex(r=>r[0]===key);
+  if(idx>=0) await sheetsUpdate(`Profile!A${idx+2}:B${idx+2}`,[[key,value]]);
+  else await sheetsAppend('Profile!A:B',[[key,value]]);
+}
+async function saveMemory(learned,confidence){
+  const entry={timestamp:new Date().toISOString(),learned,confidence,source:'chat'};
+  appData.memoryLog.push(entry);
+  await sheetsAppend('MemoryLog!A:D',[[entry.timestamp,entry.learned,entry.confidence,entry.source]]);
+}
+async function savePerson(person){
+  if(!appData.people) appData.people=[];
+  const idx=appData.people.findIndex(p=>p.name.toLowerCase()===person.name.toLowerCase());
+  if(idx>=0){
+    appData.people[idx]=person;
+    await sheetsUpdate(`People!A${idx+2}:E${idx+2}`,[[person.name,person.relationship,person.birthday,person.notes,person.source||'chat']]);
+  } else {
+    appData.people.push(person);
+    await sheetsAppend('People!A:E',[[person.name,person.relationship,person.birthday,person.notes,person.source||'chat']]);
+  }
+}
+
+// ── CLAUDE ─────────────────────────────────────────────
+function buildSystemPrompt(){
+  const today=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const profileStr=Object.entries(appData.profile).map(([k,v])=>`${k}: ${v}`).join('\n')||'Not set up yet.';
+  const itemsStr=appData.items.filter(i=>i.status!=='done').map(i=>`[${i.type.toUpperCase()}] ${i.title} | due:${i.dueDate||'no date'} | recurrence:${i.recurrence||'none'} | priority:${i.priority} | id:${i.id}`).join('\n')||'No items yet.';
+  const peopleStr=(appData.people||[]).map(p=>`${p.name} (${p.relationship}) birthday:${p.birthday||'unknown'}`).join('\n')||'None yet.';
+  const memStr=appData.memoryLog.slice(-20).map(m=>m.learned).join('\n')||'Nothing yet.';
+
+  return `You are a warm, intelligent personal life organizer assistant. You remember everything about the user's life and help them stay on top of it all.
+
+Today is ${today}.
+
+=== USER PROFILE ===
+${profileStr}
+
+=== ACTIVE ITEMS ===
+${itemsStr}
+
+=== PEOPLE ===
+${peopleStr}
+
+=== MEMORIES ===
+${memStr}
+
+=== HOW TO TAKE ACTIONS ===
+When you need to add/update data, include an ACTION block at the END of your response:
+
+<ACTION>
+{
+  "actions": [
+    {"type": "add_item", "item": {"id": "item-TIMESTAMP-RAND", "title": "Pay property taxes", "type": "task", "dueDate": "2025-04-15", "recurrence": "yearly", "recurrenceInterval": "1", "status": "pending", "priority": "high", "notes": "", "source": "chat"}},
+    {"type": "update_item", "item": {SAME FIELDS, use existing id}},
+    {"type": "add_person", "person": {"name": "Sarah", "relationship": "wife", "birthday": "1985-03-22", "notes": "", "source": "chat"}},
+    {"type": "save_profile", "key": "name", "value": "Sunil"},
+    {"type": "save_memory", "learned": "User owns a rental property in Oakland", "confidence": "confirmed"}
+  ]
+}
+</ACTION>
+
+Item types: task | birthday | appointment | recurring
+Recurrence: none | daily | weekly | monthly | yearly
+Priority: low | medium | high
+
+=== RULES ===
+- Be warm, concise, personal. You know this person.
+- Proactively save things you learn — people, obligations, life facts, preferences.
+- For recurring things (taxes, HOA, car registration), always set recurrence fields.
+- Warning windows: tasks 14 days, birthdays 14 days (+ nudge 2 days before), appointments 30 days (+ nudge 3 days before).
+- If profile is empty, warmly onboard the user — ask their name and a few key life questions.
+- After each conversation extract new memories about the person's life.
+- Always respond conversationally first, then append ACTION block only if needed.
+- Generate IDs as: "item-" + Date.now() + "-" + random 3 chars`;
+}
+
+async function callClaude(userMessage,addToHistory=true){
+  if(addToHistory) appData.chatHistory.push({role:'user',content:userMessage});
+  const r=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':cfg.anthropic,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,system:buildSystemPrompt(),messages:appData.chatHistory.slice(-20)})
+  });
+  const d=await r.json();
+  if(d.error) throw new Error(d.error.message);
+  const text=d.content.map(c=>c.text||'').join('');
+  if(addToHistory) appData.chatHistory.push({role:'assistant',content:text});
+  return text;
+}
+
+async function processActions(text){
+  const match=text.match(/<ACTION>([\s\S]*?)<\/ACTION>/);
+  if(!match) return;
+  try{
+    const parsed=JSON.parse(match[1].trim());
+    for(const a of parsed.actions||[]){
+      if(a.type==='add_item'||a.type==='update_item') await saveItem(a.item);
+      if(a.type==='add_person') await savePerson(a.person);
+      if(a.type==='save_profile') await saveProfileKey(a.key,a.value);
+      if(a.type==='save_memory') await saveMemory(a.learned,a.confidence);
+    }
+  } catch(e){console.warn('Action parse error',e);}
+}
+
+function clean(text){return text.replace(/<ACTION>[\s\S]*?<\/ACTION>/g,'').trim();}
+
+// ── RENDER ─────────────────────────────────────────────
+function daysUntil(dateStr){
+  const now=new Date();now.setHours(0,0,0,0);
+  const d=new Date(dateStr);d.setHours(0,0,0,0);
+  return Math.round((d-now)/86400000);
+}
+function urgencyBadge(days){
+  if(days<0) return '<span class="badge badge-urgent">Overdue</span>';
+  if(days===0) return '<span class="badge badge-urgent">Today</span>';
+  if(days<=3) return '<span class="badge badge-urgent">In '+days+'d</span>';
+  if(days<=14) return '<span class="badge badge-soon">In '+days+'d</span>';
+  return '<span class="badge badge-ok">In '+days+'d</span>';
+}
+function typeInfo(type){
+  if(type==='birthday') return {cls:'icon-birthday',icon:'🎂'};
+  if(type==='appointment') return {cls:'icon-appointment',icon:'🏥'};
+  if(type==='recurring') return {cls:'icon-recurring',icon:'🔁'};
+  return {cls:'icon-task',icon:'✓'};
+}
+function formatDate(s){
+  if(!s) return '';
+  return new Date(s).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+async function loadBriefing(){
+  const el=document.getElementById('briefing');
+  try{
+    const tod=new Date();
+    const h=tod.getHours();
+    const greet=h<12?'morning':h<17?'afternoon':'evening';
+    if(!appData.items.length&&!Object.keys(appData.profile).length){
+      el.className='briefing';
+      el.innerHTML=`<div class="briefing-head">Good ${greet}!</div>Head to the <strong>Chat</strong> tab to get started. I'll ask you a few questions to learn about your life.`;
+      return;
+    }
+    const resp=await callClaude(`Write a friendly 2-3 sentence ${greet} briefing for ${tod.toDateString()}. Mention the most urgent items and any upcoming birthdays. Be warm and personal. Flowing sentences, no bullet points.`,false);
+    el.className='briefing';
+    el.innerHTML=`<div class="briefing-head">Good ${greet}</div>${clean(resp)}`;
+    const urgent=appData.items.filter(i=>i.status!=='done'&&i.dueDate&&daysUntil(i.dueDate)<=14).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+    renderUpcoming(urgent);
+  } catch(e){
+    el.className='briefing';el.textContent='Could not load briefing: '+e.message;
+  }
+}
+
+function renderUpcoming(items){
+  const el=document.getElementById('upcoming-list');
+  if(!items.length){el.innerHTML='';return;}
+  el.innerHTML='<div class="section-label">Needs attention</div>'+
+    items.slice(0,8).map(item=>{
+      const {cls,icon}=typeInfo(item.type);
+      const days=daysUntil(item.dueDate);
+      return `<div class="item-card"><div class="item-icon ${cls}">${icon}</div><div style="flex:1;min-width:0"><div class="item-title">${item.title}</div><div class="item-meta">${formatDate(item.dueDate)}${item.recurrence&&item.recurrence!=='none'?' · Repeats '+item.recurrence:''}</div><div class="item-badges">${urgencyBadge(days)}<span class="badge badge-type">${item.type}</span></div></div></div>`;
+    }).join('');
+}
+
+function renderAllItems(){
+  const el=document.getElementById('all-items-list');
+  const active=appData.items.filter(i=>i.status!=='done').sort((a,b)=>{if(!a.dueDate)return 1;if(!b.dueDate)return -1;return new Date(a.dueDate)-new Date(b.dueDate);});
+  const done=appData.items.filter(i=>i.status==='done');
+  if(!active.length&&!done.length){
+    el.innerHTML='<div class="empty">No items yet.<br>Chat with Claude to add tasks, birthdays, and appointments.</div>';return;
+  }
+  let html='';
+  if(active.length){
+    html+='<div class="section-label">Active ('+active.length+')</div>';
+    html+=active.map(item=>{
+      const {cls,icon}=typeInfo(item.type);
+      const days=item.dueDate?daysUntil(item.dueDate):null;
+      return `<div class="item-card"><div class="item-icon ${cls}">${icon}</div><div style="flex:1;min-width:0"><div class="item-title">${item.title}</div><div class="item-meta">${formatDate(item.dueDate)}${item.recurrence&&item.recurrence!=='none'?' · Repeats '+item.recurrence:''}</div><div class="item-badges">${days!==null?urgencyBadge(days):''}<span class="badge badge-type">${item.priority}</span></div></div></div>`;
+    }).join('');
+  }
+  if(done.length){
+    html+='<div class="section-label">Done ('+done.length+')</div>';
+    html+=done.map(item=>`<div class="item-card" style="opacity:.45"><div class="item-icon ${typeInfo(item.type).cls}">${typeInfo(item.type).icon}</div><div style="flex:1"><div class="item-title" style="text-decoration:line-through">${item.title}</div></div></div>`).join('');
+  }
+  el.innerHTML=html;
+}
+
+function renderProfile(){
+  const el=document.getElementById('profile-view');
+  const p=appData.profile;const ppl=appData.people||[];const mem=appData.memoryLog||[];
+  let html='';
+  if(Object.keys(p).length){
+    html+=`<div class="profile-card"><h4>About you</h4>${Object.entries(p).map(([k,v])=>`<div class="pkv"><span class="pk">${k}</span><span class="pv">${v}</span></div>`).join('')}</div>`;
+  }
+  if(ppl.length){
+    html+=`<div class="profile-card"><h4>People (${ppl.length})</h4>${ppl.map(p=>`<div class="pkv"><span class="pk">${p.name} <span style="color:#ccc;font-size:11px">${p.relationship}</span></span><span class="pv">${p.birthday?formatDate(p.birthday):''}</span></div>`).join('')}</div>`;
+  }
+  if(mem.length){
+    html+=`<div class="profile-card"><h4>What I know (${mem.length} memories)</h4>${mem.slice(-12).reverse().map(m=>`<div class="pkv"><span class="pk" style="color:#888;max-width:100%">${m.learned}</span></div>`).join('')}</div>`;
+  }
+  if(!html) html='<div class="empty">No profile yet.<br>Start chatting to build your profile.</div>';
+  el.innerHTML=html;
+}
+
+// ── CHAT ───────────────────────────────────────────────
+function addBubble(text,role,thinking=false){
+  const wrap=document.getElementById('chat-messages');
+  const div=document.createElement('div');
+  div.className=`bubble ${role}${thinking?' thinking':''}`;
+  div.textContent=text;
+  wrap.appendChild(div);
+  wrap.scrollTop=wrap.scrollHeight;
+  return div;
+}
+
+async function sendMessage(){
+  const inp=document.getElementById('chat-input');
+  const msg=inp.value.trim();
+  if(!msg) return;
+  inp.value='';
+  document.getElementById('send-btn').disabled=true;
+  addBubble(msg,'user');
+  const thinking=addBubble('Thinking...','ai',true);
+  try{
+    const resp=await callClaude(msg);
+    await processActions(resp);
+    thinking.remove();
+    addBubble(clean(resp),'ai');
+    renderAllItems();renderProfile();
+    const urgent=appData.items.filter(i=>i.status!=='done'&&i.dueDate&&daysUntil(i.dueDate)<=14).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+    renderUpcoming(urgent);
+  } catch(e){
+    thinking.remove();
+    addBubble('Sorry, something went wrong: '+e.message,'ai');
+  }
+  document.getElementById('send-btn').disabled=false;
+  inp.focus();
+}
+
+// ── SETUP & NAV ────────────────────────────────────────
+async function startSetup(){
+  const btn=document.getElementById('setup-btn');
+  const err=document.getElementById('setup-error');
+  err.style.display='none';
+  cfg.sheetId=document.getElementById('cfg-sheet').value.trim();
+  cfg.clientId=document.getElementById('cfg-client-id').value.trim();
+  cfg.secret=document.getElementById('cfg-secret').value.trim();
+  cfg.refresh=document.getElementById('cfg-refresh').value.trim();
+  cfg.anthropic=document.getElementById('cfg-anthropic').value.trim();
+  if(!cfg.sheetId||!cfg.clientId||!cfg.secret||!cfg.refresh||!cfg.anthropic){
+    err.textContent='Please fill in all fields.';err.style.display='block';return;
+  }
+  btn.disabled=true;btn.textContent='Connecting...';
+  try{
+    await initSheets();
+    await loadAllData();
+    showScreen('app');
+    loadBriefing();
+    // Warm greeting in chat
+    const greet=await callClaude('Hello! I just opened the app.');
+    await processActions(greet);
+    addBubble(clean(greet),'ai');
+  } catch(e){
+    err.textContent='Connection failed: '+e.message;
+    err.style.display='block';
+    btn.disabled=false;btn.textContent='Connect & Start →';
+  }
+}
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+}
+
+function switchTab(name){
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{
+    t.classList.toggle('active',['today','chat','items','profile'][i]===name);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');
+  document.getElementById('tab-'+name).style.display='block';
+  if(name==='items') renderAllItems();
+  if(name==='profile') renderProfile();
+  if(name==='chat'){
+    const w=document.getElementById('chat-messages');w.scrollTop=w.scrollHeight;
+    document.getElementById('chat-input').focus();
+  }
+}
+</script>
+</body>
+</html>
