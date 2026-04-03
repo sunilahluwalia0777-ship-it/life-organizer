@@ -203,15 +203,37 @@ async function syncCalendar(){
     const t=await getToken();
     const now=new Date().toISOString();
     const future=new Date(Date.now()+90*864e5).toISOString();
-    const r=await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${now}&timeMax=${future}&singleEvents=true&orderBy=startTime&maxResults=50`,{headers:{Authorization:'Bearer '+t}});
-    const d=await r.json();if(d.error)throw new Error(d.error.message+' ['+d.error.code+'] reason:'+(d.error.errors&&d.error.errors[0]?d.error.errors[0].reason:'?'));
-    const items=(d.items||[]).filter(e=>e.status!=='cancelled'&&e.summary).map(e=>{
-      const start=e.start.dateTime||e.start.date||'';
-      const timeStr=e.start.dateTime?new Date(e.start.dateTime).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'';
-      return {id:'gcal-'+e.id,title:e.summary,type:'appointment',dueDate:start.substring(0,10),recurrence:'none',recurrenceInterval:'',status:'pending',priority:'medium',notes:(e.description||'')+(e.location?' · '+e.location:''),source:'google_calendar',timeStr};
-    });
-    liveItems=liveItems.filter(i=>i.source!=='google_calendar');liveItems.push(...items);
-    syncSt.calendar='ok';syncSt.calCount=items.length;updateSyncBar();
+
+    // Step 1: get ALL calendars the user has access to
+    const calListR=await fetch('https://www.googleapis.com/calendar/v3/users/me/calendarList',{headers:{Authorization:'Bearer '+t}});
+    const calListD=await calListR.json();
+    if(calListD.error) throw new Error(calListD.error.message+' ['+calListD.error.code+']');
+    const calendars=(calListD.items||[]).filter(c=>c.accessRole==='owner'||c.accessRole==='writer'||c.accessRole==='reader');
+
+    // Step 2: fetch events from each calendar
+    const allItems=[];
+    for(const cal of calendars){
+      try{
+        const r=await fetch(`https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(cal.id)}/events?timeMin=${now}&timeMax=${future}&singleEvents=true&orderBy=startTime&maxResults=50`,{headers:{Authorization:'Bearer '+t}});
+        const d=await r.json();
+        if(d.error){console.warn('Skipping calendar',cal.summary,d.error.message);continue;}
+        const events=(d.items||[]).filter(e=>e.status!=='cancelled'&&e.summary).map(e=>{
+          const start=e.start.dateTime||e.start.date||'';
+          const timeStr=e.start.dateTime?new Date(e.start.dateTime).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'';
+          return {id:'gcal-'+e.id,title:e.summary,type:'appointment',dueDate:start.substring(0,10),recurrence:'none',recurrenceInterval:'',status:'pending',priority:'medium',notes:(e.description||'')+(e.location?' · '+e.location:''),source:'google_calendar',timeStr,calendarName:cal.summary};
+        });
+        allItems.push(...events);
+      } catch(e){console.warn('Error reading calendar',cal.summary,e.message);}
+    }
+
+    // Deduplicate by event id and sort by date
+    const seen=new Set();
+    const unique=allItems.filter(i=>{if(seen.has(i.id))return false;seen.add(i.id);return true;});
+    unique.sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+
+    liveItems=liveItems.filter(i=>i.source!=='google_calendar');
+    liveItems.push(...unique);
+    syncSt.calendar='ok';syncSt.calCount=unique.length;updateSyncBar();
   } catch(e){syncSt.calendar='error';syncSt.calErr=e.message;updateSyncBar();console.error('Calendar:',e.message);}
 }
 
@@ -265,7 +287,7 @@ function buildSystem(){
   const today=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   const prof=Object.entries(appData.profile).map(([k,v])=>`${k}: ${v}`).join('\n')||'Not set up yet.';
   const sheetStr=appData.items.filter(i=>i.status!=='done').map(i=>`[${(i.type||'task').toUpperCase()}] ${i.title} | due:${i.dueDate||'no date'} | recurrence:${i.recurrence||'none'} | priority:${i.priority} | id:${i.id}`).join('\n')||'None.';
-  const calStr=liveItems.filter(i=>i.source==='google_calendar').map(i=>`[CALENDAR] ${i.title} | date:${i.dueDate} ${i.timeStr||''} | notes:${i.notes||''}`).join('\n')||'No events synced.';
+  const calStr=liveItems.filter(i=>i.source==='google_calendar').map(i=>`[CALENDAR] ${i.title} | date:${i.dueDate} ${i.timeStr||''} | calendar:${i.calendarName||'primary'} | notes:${i.notes||''}`).join('\n')||'No events synced.';
   const taskStr=liveItems.filter(i=>i.source==='google_tasks').map(i=>`[GTASK] ${i.title} | due:${i.dueDate||'no date'} | list:${i.listName||''}`).join('\n')||'No tasks synced.';
   const peopleStr=(appData.people||[]).map(p=>`${p.name} (${p.relationship}) birthday:${p.birthday||'unknown'}`).join('\n')||'None.';
   const memStr=appData.memoryLog.slice(-20).map(m=>m.learned).join('\n')||'None yet.';
@@ -414,7 +436,7 @@ function renderUpcoming(items){
       const{cls,icon}=tInfo(item.type,item.source);const d=days(item.dueDate);
       const border=item.source==='google_calendar'?' gcal':item.source==='google_tasks'?' gtask':'';
       const srcBadge=item.source==='google_calendar'?'<span class="badge b-gcal">Calendar</span>':item.source==='google_tasks'?'<span class="badge b-gtask">Tasks</span>':'';
-      return `<div class="item-card${border}"><div class="item-icon ${cls}">${icon}</div><div style="flex:1;min-width:0"><div class="item-title">${item.title}</div><div class="item-meta">${fmtDate(item.dueDate)}${item.timeStr?' · '+item.timeStr:''}${item.recurrence&&item.recurrence!=='none'?' · Repeats '+item.recurrence:''}</div><div class="item-badges">${urgBadge(d)}${srcBadge}</div></div></div>`;
+      return `<div class="item-card${border}"><div class="item-icon ${cls}">${icon}</div><div style="flex:1;min-width:0"><div class="item-title">${item.title}</div><div class="item-meta">${fmtDate(item.dueDate)}${item.timeStr?' · '+item.timeStr:''}${item.calendarName?' · '+item.calendarName:item.recurrence&&item.recurrence!=='none'?' · Repeats '+item.recurrence:''}</div><div class="item-badges">${urgBadge(d)}${srcBadge}</div></div></div>`;
     }).join('');
 }
 
@@ -430,7 +452,7 @@ function renderAllItems(){
   let html='';
   if(calItems.length){
     html+=`<div class="section-label">Google Calendar <span class="section-count">${calItems.length} events</span></div>`;
-    html+=calItems.map(i=>{const d=days(i.dueDate);return `<div class="item-card gcal"><div class="item-icon i-calendar">📅</div><div style="flex:1;min-width:0"><div class="item-title">${i.title}</div><div class="item-meta">${fmtDate(i.dueDate)}${i.timeStr?' · '+i.timeStr:''}</div><div class="item-badges">${urgBadge(d)}<span class="badge b-gcal">Calendar</span></div></div></div>`;}).join('');
+    html+=calItems.map(i=>{const d=days(i.dueDate);return `<div class="item-card gcal"><div class="item-icon i-calendar">📅</div><div style="flex:1;min-width:0"><div class="item-title">${i.title}</div><div class="item-meta">${fmtDate(i.dueDate)}${i.timeStr?' · '+i.timeStr:''}${i.calendarName?' · '+i.calendarName:''}</div><div class="item-badges">${urgBadge(d)}<span class="badge b-gcal">Calendar</span></div></div></div>`;}).join('');
   }
   if(taskItems.length){
     html+=`<div class="section-label">Google Tasks <span class="section-count">${taskItems.length} tasks</span></div>`;
