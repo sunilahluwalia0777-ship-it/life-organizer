@@ -8,14 +8,13 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min-height:100vh}
-.wrap{max-width:600px;margin:0 auto;padding:1.5rem 1rem 4rem}
-
-/* SETUP */
+.wrap{max-width:620px;margin:0 auto;padding:1.5rem 1rem 4rem}
 .setup-logo{font-family:'Playfair Display',serif;font-size:34px;font-weight:400;margin-bottom:4px}
 .setup-logo em{font-style:italic;color:#555}
 .setup-sub{font-size:13px;color:#888;margin-bottom:2rem}
 .card{background:#fff;border:1px solid #e8e4dd;border-radius:16px;padding:1.25rem 1.5rem;margin-bottom:12px}
 .card h3{font-size:11px;font-weight:500;color:#999;letter-spacing:.07em;text-transform:uppercase;margin-bottom:1rem}
+.card-note{font-size:12px;color:#999;margin-bottom:12px;padding:8px 10px;background:#fafaf8;border-radius:8px;border:1px solid #eee;line-height:1.5}
 .field{margin-bottom:11px}
 .field label{display:block;font-size:12px;font-weight:500;color:#666;margin-bottom:4px}
 .field input{width:100%;font-size:14px;font-family:'DM Sans',sans-serif;padding:9px 12px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#1a1a1a;outline:none}
@@ -26,47 +25,49 @@ body{font-family:'DM Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min-heigh
 .btn-primary:disabled{opacity:.4;cursor:not-allowed}
 .setup-note{font-size:11px;color:#aaa;text-align:center;margin-top:10px;line-height:1.5}
 .error-msg{background:#fef2f2;color:#991b1b;border:1px solid #fecaca;font-size:13px;padding:10px 14px;border-radius:8px;margin-bottom:12px}
-
-/* APP HEADER */
 .app-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
 .app-logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:400}
 .app-logo em{font-style:italic;color:#666}
 .settings-btn{font-size:12px;color:#999;background:#fff;border:1px solid #e0dbd3;border-radius:8px;padding:5px 11px;cursor:pointer;font-family:'DM Sans',sans-serif}
 .conn-status{font-size:12px;color:#888;display:flex;align-items:center;gap:5px}
-.conn-dot{width:7px;height:7px;border-radius:50%;background:#22c55e}
-.conn-dot.red{background:#ef4444}
-
-/* NAV */
+.conn-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0}
+.sync-bar{display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap}
+.sync-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:5px}
+.sync-pill.ok{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.sync-pill.warn{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+.sync-pill.syncing{background:#eff6ff;color:#1e40af;border:1px solid #bfdbfe}
+.sync-pill.error{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.sdot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
 .nav{display:flex;gap:2px;background:#ede9e2;border-radius:10px;padding:3px;margin-bottom:1.25rem}
 .nav-tab{flex:1;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;color:#777;background:none;border:none;padding:7px 4px;border-radius:7px;cursor:pointer;transition:all .15s;text-align:center}
 .nav-tab.active{background:#fff;color:#1a1a1a;box-shadow:0 1px 4px rgba(0,0,0,.09)}
-
-/* BRIEFING */
 .briefing{background:#fff;border:1px solid #e8e4dd;border-radius:14px;padding:1.1rem 1.35rem;margin-bottom:1rem;font-size:14px;line-height:1.65;color:#555}
 .briefing.loading{color:#aaa;font-style:italic}
 .briefing-head{font-family:'Playfair Display',serif;font-size:17px;color:#1a1a1a;margin-bottom:6px;font-weight:400}
-
-/* ITEMS */
-.section-label{font-size:11px;font-weight:500;color:#aaa;letter-spacing:.07em;text-transform:uppercase;margin:1.1rem 0 7px}
+.section-label{font-size:11px;font-weight:500;color:#aaa;letter-spacing:.07em;text-transform:uppercase;margin:1.1rem 0 7px;display:flex;justify-content:space-between}
+.section-count{font-weight:400;color:#ccc}
 .item-card{background:#fff;border:1px solid #e8e4dd;border-radius:14px;padding:.9rem 1.1rem;margin-bottom:8px;display:flex;align-items:flex-start;gap:11px}
+.item-card.gcal{border-left:3px solid #4285f4}
+.item-card.gtask{border-left:3px solid #0f9d58}
 .item-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.icon-task{background:#eeecfe;color:#4f46e5}
-.icon-birthday{background:#fce7f3;color:#be185d}
-.icon-appointment{background:#dbeafe;color:#1d4ed8}
-.icon-recurring{background:#dcfce7;color:#166534}
+.i-task{background:#eeecfe;color:#4f46e5}
+.i-birthday{background:#fce7f3;color:#be185d}
+.i-appointment{background:#dbeafe;color:#1d4ed8}
+.i-recurring{background:#dcfce7;color:#166534}
+.i-calendar{background:#e8f0fe;color:#1a73e8}
 .item-title{font-size:14px;font-weight:500;color:#1a1a1a;line-height:1.3}
 .item-meta{font-size:12px;color:#aaa;margin-top:2px}
 .item-badges{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap}
 .badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px}
-.badge-urgent{background:#fef2f2;color:#991b1b}
-.badge-soon{background:#fffbeb;color:#92400e}
-.badge-ok{background:#f0fdf4;color:#166534}
-.badge-type{background:#f5f5f5;color:#666}
-.empty{text-align:center;padding:2.5rem 1rem;color:#bbb;font-size:14px}
-
-/* CHAT */
+.b-urgent{background:#fef2f2;color:#991b1b}
+.b-soon{background:#fffbeb;color:#92400e}
+.b-ok{background:#f0fdf4;color:#166534}
+.b-type{background:#f5f5f5;color:#666}
+.b-gcal{background:#e8f0fe;color:#1557b0}
+.b-gtask{background:#e6f4ea;color:#137333}
+.empty{text-align:center;padding:2.5rem 1rem;color:#bbb;font-size:14px;line-height:1.7}
 .chat-wrap{display:flex;flex-direction:column;gap:10px;min-height:200px;margin-bottom:12px}
-.bubble{max-width:88%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.55}
+.bubble{max-width:88%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}
 .bubble.user{align-self:flex-end;background:#1a1a1a;color:#fff;border-bottom-right-radius:4px}
 .bubble.ai{align-self:flex-start;background:#fff;color:#1a1a1a;border:1px solid #e8e4dd;border-bottom-left-radius:4px}
 .bubble.ai.thinking{color:#bbb;font-style:italic}
@@ -75,14 +76,11 @@ body{font-family:'DM Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min-heigh
 .chat-input:focus{border-color:#999}
 .send-btn{font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;padding:10px 16px;background:#1a1a1a;color:#fff;border:none;border-radius:14px;cursor:pointer}
 .send-btn:disabled{opacity:.4;cursor:not-allowed}
-
-/* PROFILE */
 .profile-card{background:#fff;border:1px solid #e8e4dd;border-radius:14px;padding:1rem 1.25rem;margin-bottom:10px}
 .profile-card h4{font-size:11px;font-weight:500;color:#aaa;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
-.pkv{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0ede8;font-size:13px}
+.pkv{display:flex;justify-content:space-between;align-items:flex-start;padding:6px 0;border-bottom:1px solid #f0ede8;font-size:13px;gap:8px}
 .pkv:last-child{border-bottom:none}
-.pk{color:#888}.pv{color:#1a1a1a;font-weight:500;text-align:right;max-width:60%}
-
+.pk{color:#888;flex-shrink:0}.pv{color:#1a1a1a;font-weight:500;text-align:right}
 .screen{display:none}.screen.active{display:block}
 .tab-panel{display:none}
 </style>
@@ -90,44 +88,25 @@ body{font-family:'DM Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min-heigh
 <body>
 <div class="wrap">
 
-<!-- SETUP SCREEN -->
+<!-- SETUP -->
 <div id="screen-setup" class="screen active">
   <div class="setup-logo">My Life <em>Organizer</em></div>
-  <div class="setup-sub">Powered by Claude · Backed by Google Sheets</div>
-
+  <div class="setup-sub">Phase 2 · Google Calendar + Tasks sync</div>
   <div class="card">
-    <h3>Google Sheets credentials</h3>
-    <div class="field">
-      <label>Sheet ID</label>
-      <input id="cfg-sheet" type="text" placeholder="1PsLFRjGvsFfTrcKyw..." autocomplete="off"/>
-      <div class="hint">From your Google Sheets URL: /spreadsheets/d/<strong>THIS_PART</strong>/edit</div>
-    </div>
-    <div class="field">
-      <label>Client ID</label>
-      <input id="cfg-client-id" type="text" placeholder="794042381190-..." autocomplete="off"/>
-    </div>
-    <div class="field">
-      <label>Client Secret</label>
-      <input id="cfg-secret" type="password" placeholder="GOCSPX-..." autocomplete="off"/>
-    </div>
-    <div class="field">
-      <label>Refresh Token</label>
-      <input id="cfg-refresh" type="password" placeholder="1//04OOf7ANV..." autocomplete="off"/>
-    </div>
+    <h3>Google credentials</h3>
+    <div class="card-note">Your refresh token needs Sheets + Calendar + Tasks scopes. If you only had Sheets before, generate a new token at <strong>developers.google.com/oauthplayground</strong> with all three scopes selected.</div>
+    <div class="field"><label>Sheet ID</label><input id="cfg-sheet" type="text" placeholder="1PsLFRjGvsFfTrcKyw..." autocomplete="off"/><div class="hint">From your Google Sheets URL: /spreadsheets/d/<strong>THIS_PART</strong>/edit</div></div>
+    <div class="field"><label>Client ID</label><input id="cfg-client-id" type="text" placeholder="794042381190-..." autocomplete="off"/></div>
+    <div class="field"><label>Client Secret</label><input id="cfg-secret" type="password" placeholder="GOCSPX-..." autocomplete="off"/></div>
+    <div class="field"><label>Refresh Token</label><input id="cfg-refresh" type="password" placeholder="1//04OOf7ANV..." autocomplete="off"/></div>
   </div>
-
   <div class="card">
     <h3>Anthropic API key</h3>
-    <div class="field">
-      <label>API Key</label>
-      <input id="cfg-anthropic" type="password" placeholder="sk-ant-..." autocomplete="off"/>
-      <div class="hint">Get yours at console.anthropic.com · Usage billed to your account</div>
-    </div>
+    <div class="field"><label>API Key</label><input id="cfg-anthropic" type="password" placeholder="sk-ant-..." autocomplete="off"/><div class="hint">Get yours at console.anthropic.com</div></div>
   </div>
-
   <div id="setup-error" class="error-msg" style="display:none"></div>
-  <button class="btn-primary" id="setup-btn" onclick="startSetup()">Connect & Start →</button>
-  <div class="setup-note">Credentials are stored only in this browser session and sent only to Google and Anthropic directly.</div>
+  <button class="btn-primary" id="setup-btn" onclick="startSetup()">Connect & Sync →</button>
+  <div class="setup-note">Credentials stored only in this browser session · sent only to Google and Anthropic directly</div>
 </div>
 
 <!-- MAIN APP -->
@@ -139,178 +118,173 @@ body{font-family:'DM Sans',sans-serif;background:#f7f5f0;color:#1a1a1a;min-heigh
       <button class="settings-btn" onclick="showScreen('setup')">Settings</button>
     </div>
   </div>
-
+  <div class="sync-bar" id="sync-bar"></div>
   <div class="nav">
     <button class="nav-tab active" onclick="switchTab('today')">Today</button>
     <button class="nav-tab" onclick="switchTab('chat')">Chat</button>
     <button class="nav-tab" onclick="switchTab('items')">All Items</button>
     <button class="nav-tab" onclick="switchTab('profile')">Profile</button>
   </div>
-
-  <!-- TODAY -->
   <div id="tab-today" class="tab-panel" style="display:block">
-    <div id="briefing" class="briefing loading">Checking what needs your attention today...</div>
+    <div id="briefing" class="briefing loading">Syncing your calendar and tasks...</div>
     <div id="upcoming-list"></div>
   </div>
-
-  <!-- CHAT -->
   <div id="tab-chat" class="tab-panel">
     <div class="chat-wrap" id="chat-messages"></div>
     <div class="chat-input-row">
-      <input class="chat-input" id="chat-input" placeholder="Tell me anything — tasks, birthdays, appointments..." onkeydown="if(event.key==='Enter')sendMessage()"/>
+      <input class="chat-input" id="chat-input" placeholder="Ask me anything about your schedule..." onkeydown="if(event.key==='Enter')sendMessage()"/>
       <button class="send-btn" id="send-btn" onclick="sendMessage()">Send</button>
     </div>
   </div>
-
-  <!-- ALL ITEMS -->
-  <div id="tab-items" class="tab-panel">
-    <div id="all-items-list"></div>
-  </div>
-
-  <!-- PROFILE -->
-  <div id="tab-profile" class="tab-panel">
-    <div id="profile-view"></div>
-  </div>
+  <div id="tab-items" class="tab-panel"><div id="all-items-list"></div></div>
+  <div id="tab-profile" class="tab-panel"><div id="profile-view"></div></div>
 </div>
 
 </div>
 <script>
-// ── CONFIG & STATE ─────────────────────────────────────
 let cfg={sheetId:'',clientId:'',secret:'',refresh:'',anthropic:'',accessToken:'',tokenExpiry:0};
 let appData={profile:{},items:[],people:[],memoryLog:[],chatHistory:[]};
+let syncSt={sheets:'pending',calendar:'pending',tasks:'pending',calCount:0,taskCount:0,calErr:'',taskErr:''};
+let liveItems=[];
 
-// ── GOOGLE OAUTH ───────────────────────────────────────
-async function getAccessToken(){
+async function getToken(){
   if(cfg.accessToken&&Date.now()<cfg.tokenExpiry) return cfg.accessToken;
-  const r=await fetch('https://oauth2.googleapis.com/token',{
-    method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
-    body:`client_id=${encodeURIComponent(cfg.clientId)}&client_secret=${encodeURIComponent(cfg.secret)}&refresh_token=${encodeURIComponent(cfg.refresh)}&grant_type=refresh_token`
-  });
+  const r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:`client_id=${encodeURIComponent(cfg.clientId)}&client_secret=${encodeURIComponent(cfg.secret)}&refresh_token=${encodeURIComponent(cfg.refresh)}&grant_type=refresh_token`});
   const d=await r.json();
   if(!d.access_token) throw new Error('Token refresh failed: '+(d.error_description||d.error||'unknown'));
-  cfg.accessToken=d.access_token;
-  cfg.tokenExpiry=Date.now()+(d.expires_in-60)*1000;
+  cfg.accessToken=d.access_token;cfg.tokenExpiry=Date.now()+(d.expires_in-60)*1000;
   return cfg.accessToken;
 }
 
-// ── SHEETS HELPERS ─────────────────────────────────────
-async function sheetsGet(range){
-  const tok=await getAccessToken();
-  const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${encodeURIComponent(range)}`,{headers:{Authorization:'Bearer '+tok}});
-  const d=await r.json();
-  if(d.error) throw new Error(d.error.message);
-  return d.values||[];
+async function shGet(range){
+  const t=await getToken();
+  const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${encodeURIComponent(range)}`,{headers:{Authorization:'Bearer '+t}});
+  const d=await r.json();if(d.error)throw new Error('Sheets: '+d.error.message);return d.values||[];
 }
-async function sheetsUpdate(range,values){
-  const tok=await getAccessToken();
-  const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${encodeURIComponent(range)}?valueInputOption=RAW`,{
-    method:'PUT',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},
-    body:JSON.stringify({range,majorDimension:'ROWS',values})
-  });
-  const d=await r.json();
-  if(d.error) throw new Error(d.error.message);
+async function shPut(range,values){
+  const t=await getToken();
+  const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${encodeURIComponent(range)}?valueInputOption=RAW`,{method:'PUT',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify({range,majorDimension:'ROWS',values})});
+  const d=await r.json();if(d.error)throw new Error('Sheets put: '+d.error.message);
 }
-async function sheetsAppend(range,values){
-  const tok=await getAccessToken();
-  const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${encodeURIComponent(range)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,{
-    method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},
-    body:JSON.stringify({range,majorDimension:'ROWS',values})
-  });
-  const d=await r.json();
-  if(d.error) throw new Error(d.error.message);
+async function shAppend(range,values){
+  const t=await getToken();
+  const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}/values/${encodeURIComponent(range)}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify({range,majorDimension:'ROWS',values})});
+  const d=await r.json();if(d.error)throw new Error('Sheets append: '+d.error.message);
 }
 
-// ── INIT SHEETS ────────────────────────────────────────
 async function initSheets(){
-  const tok=await getAccessToken();
-  const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}`,{headers:{Authorization:'Bearer '+tok}});
-  const meta=await r.json();
-  if(meta.error) throw new Error(meta.error.message);
+  const t=await getToken();
+  const r=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}`,{headers:{Authorization:'Bearer '+t}});
+  const meta=await r.json();if(meta.error)throw new Error('Cannot access sheet: '+meta.error.message);
   const existing=meta.sheets.map(s=>s.properties.title);
-  const needed=['Profile','Items','People','MemoryLog'];
-  const toCreate=needed.filter(n=>!existing.includes(n));
+  const toCreate=['Profile','Items','People','MemoryLog'].filter(n=>!existing.includes(n));
   if(toCreate.length){
-    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}:batchUpdate`,{
-      method:'POST',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},
-      body:JSON.stringify({requests:toCreate.map(title=>({addSheet:{properties:{title}}}))})
-    });
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${cfg.sheetId}:batchUpdate`,{method:'POST',headers:{Authorization:'Bearer '+t,'Content-Type':'application/json'},body:JSON.stringify({requests:toCreate.map(title=>({addSheet:{properties:{title}}}))})});
   }
-  // Seed headers
-  const items=await sheetsGet('Items!A1:A1');
-  if(!items.length||!items[0][0]) await sheetsUpdate('Items!A1:J1',[['ID','Title','Type','DueDate','Recurrence','RecurrenceInterval','Status','Priority','Notes','Source']]);
-  const prof=await sheetsGet('Profile!A1:A1');
-  if(!prof.length||!prof[0][0]) await sheetsUpdate('Profile!A1:B1',[['Key','Value']]);
-  const ppl=await sheetsGet('People!A1:A1');
-  if(!ppl.length||!ppl[0][0]) await sheetsUpdate('People!A1:E1',[['Name','Relationship','Birthday','Notes','Source']]);
-  const mem=await sheetsGet('MemoryLog!A1:A1');
-  if(!mem.length||!mem[0][0]) await sheetsUpdate('MemoryLog!A1:D1',[['Timestamp','Learned','Confidence','Source']]);
+  const chk=async(sh,hdrs)=>{const v=await shGet(sh+'!A1:A1');if(!v.length||!v[0][0])await shPut(sh+'!A1:'+String.fromCharCode(64+hdrs.length)+'1',[hdrs]);};
+  await chk('Items',['ID','Title','Type','DueDate','Recurrence','RecurrenceInterval','Status','Priority','Notes','Source']);
+  await chk('Profile',['Key','Value']);
+  await chk('People',['Name','Relationship','Birthday','Notes','Source']);
+  await chk('MemoryLog',['Timestamp','Learned','Confidence','Source']);
+  syncSt.sheets='ok';updateSyncBar();
 }
 
-// ── LOAD DATA ──────────────────────────────────────────
-async function loadAllData(){
-  const rows=await sheetsGet('Items!A2:J1000');
-  appData.items=rows.filter(r=>r[0]).map(r=>({id:r[0]||'',title:r[1]||'',type:(r[2]||'task').toLowerCase(),dueDate:r[3]||'',recurrence:r[4]||'none',recurrenceInterval:r[5]||'',status:r[6]||'pending',priority:r[7]||'medium',notes:r[8]||'',source:r[9]||'chat'}));
-  const pr=await sheetsGet('Profile!A2:B1000');
-  appData.profile={};
-  pr.filter(r=>r[0]).forEach(r=>{appData.profile[r[0]]=r[1]||'';});
-  const pp=await sheetsGet('People!A2:E1000');
-  appData.people=pp.filter(r=>r[0]).map(r=>({name:r[0],relationship:r[1]||'',birthday:r[2]||'',notes:r[3]||'',source:r[4]||''}));
-  const ml=await sheetsGet('MemoryLog!A2:D500');
-  appData.memoryLog=ml.filter(r=>r[0]).map(r=>({timestamp:r[0],learned:r[1],confidence:r[2],source:r[3]}));
+async function loadData(){
+  const rows=await shGet('Items!A2:J1000');
+  appData.items=rows.filter(r=>r[0]).map(r=>({id:r[0],title:r[1]||'',type:(r[2]||'task').toLowerCase(),dueDate:r[3]||'',recurrence:r[4]||'none',recurrenceInterval:r[5]||'',status:r[6]||'pending',priority:r[7]||'medium',notes:r[8]||'',source:r[9]||'chat'}));
+  const pr=await shGet('Profile!A2:B1000');appData.profile={};pr.filter(r=>r[0]).forEach(r=>{appData.profile[r[0]]=r[1]||'';});
+  const pp=await shGet('People!A2:E1000');appData.people=pp.filter(r=>r[0]).map(r=>({name:r[0],relationship:r[1]||'',birthday:r[2]||'',notes:r[3]||'',source:r[4]||''}));
+  const ml=await shGet('MemoryLog!A2:D500');appData.memoryLog=ml.filter(r=>r[0]).map(r=>({timestamp:r[0],learned:r[1],confidence:r[2],source:r[3]}));
 }
 
-// ── SAVE HELPERS ───────────────────────────────────────
+async function syncCalendar(){
+  syncSt.calendar='syncing';updateSyncBar();
+  try{
+    const t=await getToken();
+    const now=new Date().toISOString();
+    const future=new Date(Date.now()+90*864e5).toISOString();
+    const r=await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${now}&timeMax=${future}&singleEvents=true&orderBy=startTime&maxResults=50`,{headers:{Authorization:'Bearer '+t}});
+    const d=await r.json();if(d.error)throw new Error(d.error.message);
+    const items=(d.items||[]).filter(e=>e.status!=='cancelled'&&e.summary).map(e=>{
+      const start=e.start.dateTime||e.start.date||'';
+      const timeStr=e.start.dateTime?new Date(e.start.dateTime).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'}):'';
+      return {id:'gcal-'+e.id,title:e.summary,type:'appointment',dueDate:start.substring(0,10),recurrence:'none',recurrenceInterval:'',status:'pending',priority:'medium',notes:(e.description||'')+(e.location?' · '+e.location:''),source:'google_calendar',timeStr};
+    });
+    liveItems=liveItems.filter(i=>i.source!=='google_calendar');liveItems.push(...items);
+    syncSt.calendar='ok';syncSt.calCount=items.length;updateSyncBar();
+  } catch(e){syncSt.calendar='error';syncSt.calErr=e.message;updateSyncBar();}
+}
+
+async function syncTasks(){
+  syncSt.tasks='syncing';updateSyncBar();
+  try{
+    const t=await getToken();
+    const lr=await fetch('https://tasks.googleapis.com/tasks/v1/users/@me/lists',{headers:{Authorization:'Bearer '+t}});
+    const ld=await lr.json();if(ld.error)throw new Error(ld.error.message);
+    const items=[];
+    for(const list of (ld.items||[])){
+      const tr=await fetch(`https://tasks.googleapis.com/tasks/v1/lists/${list.id}/tasks?showCompleted=false&maxResults=50`,{headers:{Authorization:'Bearer '+t}});
+      const td=await tr.json();if(td.error)continue;
+      for(const task of (td.items||[])){
+        if(!task.title||task.status==='completed')continue;
+        items.push({id:'gtask-'+task.id,title:task.title,type:'task',dueDate:task.due?task.due.substring(0,10):'',recurrence:'none',recurrenceInterval:'',status:'pending',priority:'medium',notes:task.notes||'',source:'google_tasks',listName:list.title,timeStr:''});
+      }
+    }
+    liveItems=liveItems.filter(i=>i.source!=='google_tasks');liveItems.push(...items);
+    syncSt.tasks='ok';syncSt.taskCount=items.length;updateSyncBar();
+  } catch(e){syncSt.tasks='error';syncSt.taskErr=e.message;updateSyncBar();}
+}
+
+function allItems(){
+  const sheetIds=new Set(appData.items.map(i=>i.id));
+  return [...appData.items,...liveItems.filter(i=>!sheetIds.has(i.id))];
+}
+
 async function saveItem(item){
   const idx=appData.items.findIndex(i=>i.id===item.id);
-  if(idx>=0){
-    appData.items[idx]=item;
-    await sheetsUpdate(`Items!A${idx+2}:J${idx+2}`,[[item.id,item.title,item.type,item.dueDate,item.recurrence,item.recurrenceInterval,item.status,item.priority,item.notes,item.source]]);
-  } else {
-    appData.items.push(item);
-    await sheetsAppend('Items!A:J',[[item.id,item.title,item.type,item.dueDate,item.recurrence,item.recurrenceInterval,item.status,item.priority,item.notes,item.source]]);
-  }
+  if(idx>=0){appData.items[idx]=item;await shPut(`Items!A${idx+2}:J${idx+2}`,[[item.id,item.title,item.type,item.dueDate,item.recurrence,item.recurrenceInterval,item.status,item.priority,item.notes,item.source]]);}
+  else{appData.items.push(item);await shAppend('Items!A:J',[[item.id,item.title,item.type,item.dueDate,item.recurrence,item.recurrenceInterval,item.status,item.priority,item.notes,item.source]]);}
 }
-async function saveProfileKey(key,value){
+async function saveProfile(key,value){
   appData.profile[key]=value;
-  const pr=await sheetsGet('Profile!A2:B1000');
-  const idx=pr.findIndex(r=>r[0]===key);
-  if(idx>=0) await sheetsUpdate(`Profile!A${idx+2}:B${idx+2}`,[[key,value]]);
-  else await sheetsAppend('Profile!A:B',[[key,value]]);
+  const pr=await shGet('Profile!A2:B1000');const idx=pr.findIndex(r=>r[0]===key);
+  if(idx>=0)await shPut(`Profile!A${idx+2}:B${idx+2}`,[[key,value]]);else await shAppend('Profile!A:B',[[key,value]]);
 }
 async function saveMemory(learned,confidence){
-  const entry={timestamp:new Date().toISOString(),learned,confidence,source:'chat'};
-  appData.memoryLog.push(entry);
-  await sheetsAppend('MemoryLog!A:D',[[entry.timestamp,entry.learned,entry.confidence,entry.source]]);
+  const e={timestamp:new Date().toISOString(),learned,confidence,source:'chat'};
+  appData.memoryLog.push(e);await shAppend('MemoryLog!A:D',[[e.timestamp,e.learned,e.confidence,e.source]]);
 }
 async function savePerson(person){
-  if(!appData.people) appData.people=[];
+  if(!appData.people)appData.people=[];
   const idx=appData.people.findIndex(p=>p.name.toLowerCase()===person.name.toLowerCase());
-  if(idx>=0){
-    appData.people[idx]=person;
-    await sheetsUpdate(`People!A${idx+2}:E${idx+2}`,[[person.name,person.relationship,person.birthday,person.notes,person.source||'chat']]);
-  } else {
-    appData.people.push(person);
-    await sheetsAppend('People!A:E',[[person.name,person.relationship,person.birthday,person.notes,person.source||'chat']]);
-  }
+  if(idx>=0){appData.people[idx]=person;await shPut(`People!A${idx+2}:E${idx+2}`,[[person.name,person.relationship,person.birthday,person.notes,person.source||'chat']]);}
+  else{appData.people.push(person);await shAppend('People!A:E',[[person.name,person.relationship,person.birthday,person.notes,person.source||'chat']]);}
 }
 
-// ── CLAUDE ─────────────────────────────────────────────
-function buildSystemPrompt(){
+function buildSystem(){
   const today=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  const profileStr=Object.entries(appData.profile).map(([k,v])=>`${k}: ${v}`).join('\n')||'Not set up yet.';
-  const itemsStr=appData.items.filter(i=>i.status!=='done').map(i=>`[${(i.type||'task').toUpperCase()}] ${i.title||'Untitled'} | due:${i.dueDate||'no date'} | recurrence:${i.recurrence||'none'} | priority:${i.priority||'medium'} | id:${i.id}`).join('\n')||'No items yet.';
-  const peopleStr=(appData.people||[]).map(p=>`${p.name} (${p.relationship}) birthday:${p.birthday||'unknown'}`).join('\n')||'None yet.';
-  const memStr=appData.memoryLog.slice(-20).map(m=>m.learned).join('\n')||'Nothing yet.';
+  const prof=Object.entries(appData.profile).map(([k,v])=>`${k}: ${v}`).join('\n')||'Not set up yet.';
+  const sheetStr=appData.items.filter(i=>i.status!=='done').map(i=>`[${(i.type||'task').toUpperCase()}] ${i.title} | due:${i.dueDate||'no date'} | recurrence:${i.recurrence||'none'} | priority:${i.priority} | id:${i.id}`).join('\n')||'None.';
+  const calStr=liveItems.filter(i=>i.source==='google_calendar').map(i=>`[CALENDAR] ${i.title} | date:${i.dueDate} ${i.timeStr||''} | notes:${i.notes||''}`).join('\n')||'No events synced.';
+  const taskStr=liveItems.filter(i=>i.source==='google_tasks').map(i=>`[GTASK] ${i.title} | due:${i.dueDate||'no date'} | list:${i.listName||''}`).join('\n')||'No tasks synced.';
+  const peopleStr=(appData.people||[]).map(p=>`${p.name} (${p.relationship}) birthday:${p.birthday||'unknown'}`).join('\n')||'None.';
+  const memStr=appData.memoryLog.slice(-20).map(m=>m.learned).join('\n')||'None yet.';
 
-  return `You are a warm, intelligent personal life organizer assistant. You remember everything about the user's life and help them stay on top of it all.
+  return `You are a warm, intelligent personal life organizer. You have full visibility into this person's life — their manual items, Google Calendar, and Google Tasks.
 
 Today is ${today}.
 
 === USER PROFILE ===
-${profileStr}
+${prof}
 
-=== ACTIVE ITEMS ===
-${itemsStr}
+=== MY ITEMS (Google Sheets — persistent) ===
+${sheetStr}
+
+=== GOOGLE CALENDAR (live, read-only) ===
+${calStr}
+
+=== GOOGLE TASKS (live, read-only) ===
+${taskStr}
 
 === PEOPLE ===
 ${peopleStr}
@@ -318,142 +292,148 @@ ${peopleStr}
 === MEMORIES ===
 ${memStr}
 
-=== HOW TO TAKE ACTIONS ===
-When you need to add/update data, include an ACTION block at the END of your response:
+=== ACTIONS ===
+To add/update data, append an ACTION block at the END of your message:
 
 <ACTION>
 {
   "actions": [
     {"type": "add_item", "item": {"id": "item-TIMESTAMP-RAND", "title": "Pay property taxes", "type": "task", "dueDate": "2025-04-15", "recurrence": "yearly", "recurrenceInterval": "1", "status": "pending", "priority": "high", "notes": "", "source": "chat"}},
-    {"type": "update_item", "item": {SAME FIELDS, use existing id}},
-    {"type": "add_person", "person": {"name": "Sarah", "relationship": "wife", "birthday": "1985-03-22", "notes": "", "source": "chat"}},
+    {"type": "update_item", "item": {SAME FIELDS with existing id}},
+    {"type": "add_person", "person": {"name": "Sarah", "relationship": "wife", "birthday": "1985-03-22", "notes": ""}},
     {"type": "save_profile", "key": "name", "value": "Sunil"},
     {"type": "save_memory", "learned": "User owns a rental property in Oakland", "confidence": "confirmed"}
   ]
 }
 </ACTION>
 
-Item types: task | birthday | appointment | recurring
-Recurrence: none | daily | weekly | monthly | yearly
-Priority: low | medium | high
+Types: task|birthday|appointment|recurring. Recurrence: none|daily|weekly|monthly|yearly. Priority: low|medium|high.
+
+IMPORTANT: Google Calendar and Tasks are READ-ONLY. Reference them freely in conversation but do NOT add_item for things already there. Only write to the sheet for new manually-tracked items.
 
 === RULES ===
-- Be warm, concise, personal. You know this person.
-- Proactively save things you learn — people, obligations, life facts, preferences.
-- For recurring things (taxes, HOA, car registration), always set recurrence fields.
-- Warning windows: tasks 14 days, birthdays 14 days (+ nudge 2 days before), appointments 30 days (+ nudge 3 days before).
-- If profile is empty, warmly onboard the user — ask their name and a few key life questions.
-- After each conversation extract new memories about the person's life.
-- Always respond conversationally first, then append ACTION block only if needed.
-- Generate IDs as: "item-" + Date.now() + "-" + random 3 chars`;
+- Be warm, concise, and personal.
+- Reference calendar events naturally: "I see you have X on Tuesday".
+- Reference tasks: "You have Y in your task list".
+- Proactively save life facts as memories.
+- For recurring items always set recurrence fields.
+- Warning windows: tasks 14d, birthdays 14d+2d nudge, appointments 30d+3d nudge.
+- If profile is empty, onboard warmly.
+- Generate IDs: "item-" + Date.now() + "-" + 3 random chars.`;
 }
 
-async function callClaude(userMessage,addToHistory=true){
-  if(addToHistory) appData.chatHistory.push({role:'user',content:userMessage});
-  const r=await fetch('https://api.anthropic.com/v1/messages',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','x-api-key':cfg.anthropic,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,system:buildSystemPrompt(),messages:appData.chatHistory.slice(-20)})
-  });
-  const d=await r.json();
-  if(d.error) throw new Error(d.error.message);
+async function claude(msg,history=true){
+  if(history)appData.chatHistory.push({role:'user',content:msg});
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':cfg.anthropic,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,system:buildSystem(),messages:appData.chatHistory.slice(-20)})});
+  const d=await r.json();if(d.error)throw new Error('Claude: '+d.error.message);
   const text=d.content.map(c=>c.text||'').join('');
-  if(addToHistory) appData.chatHistory.push({role:'assistant',content:text});
+  if(history)appData.chatHistory.push({role:'assistant',content:text});
   return text;
 }
 
-async function processActions(text){
-  const match=text.match(/<ACTION>([\s\S]*?)<\/ACTION>/);
-  if(!match) return;
+async function runActions(text){
+  const m=text.match(/<ACTION>([\s\S]*?)<\/ACTION>/);if(!m)return;
   try{
-    const parsed=JSON.parse(match[1].trim());
-    for(const a of parsed.actions||[]){
-      if(a.type==='add_item'||a.type==='update_item') await saveItem(a.item);
-      if(a.type==='add_person') await savePerson(a.person);
-      if(a.type==='save_profile') await saveProfileKey(a.key,a.value);
-      if(a.type==='save_memory') await saveMemory(a.learned,a.confidence);
+    const p=JSON.parse(m[1].trim());
+    for(const a of p.actions||[]){
+      if(a.type==='add_item'||a.type==='update_item')await saveItem(a.item);
+      if(a.type==='add_person')await savePerson(a.person);
+      if(a.type==='save_profile')await saveProfile(a.key,a.value);
+      if(a.type==='save_memory')await saveMemory(a.learned,a.confidence);
     }
-  } catch(e){console.warn('Action parse error',e);}
+  }catch(e){console.warn('Action err',e);}
 }
 
-function clean(text){return text.replace(/<ACTION>[\s\S]*?<\/ACTION>/g,'').trim();}
+function clean(t){return t.replace(/<ACTION>[\s\S]*?<\/ACTION>/g,'').trim();}
 
-// ── RENDER ─────────────────────────────────────────────
-function daysUntil(dateStr){
-  const now=new Date();now.setHours(0,0,0,0);
-  const d=new Date(dateStr);d.setHours(0,0,0,0);
-  return Math.round((d-now)/86400000);
+function updateSyncBar(){
+  const bar=document.getElementById('sync-bar');if(!bar)return;
+  const pill=(label,cls)=>`<div class="sync-pill ${cls}"><span class="sdot"></span>${label}</div>`;
+  const sc={ok:'ok',pending:'syncing',syncing:'syncing',error:'error'};
+  bar.innerHTML=
+    pill('Sheets '+(syncSt.sheets==='ok'?'✓':'…'),sc[syncSt.sheets]||'syncing')+
+    pill('Calendar '+(syncSt.calendar==='ok'?'('+syncSt.calCount+')':syncSt.calendar==='error'?'error':'…'),sc[syncSt.calendar]||'syncing')+
+    pill('Tasks '+(syncSt.tasks==='ok'?'('+syncSt.taskCount+')':syncSt.tasks==='error'?'error':'…'),sc[syncSt.tasks]||'syncing');
 }
-function urgencyBadge(days){
-  if(days<0) return '<span class="badge badge-urgent">Overdue</span>';
-  if(days===0) return '<span class="badge badge-urgent">Today</span>';
-  if(days<=3) return '<span class="badge badge-urgent">In '+days+'d</span>';
-  if(days<=14) return '<span class="badge badge-soon">In '+days+'d</span>';
-  return '<span class="badge badge-ok">In '+days+'d</span>';
+
+function days(ds){
+  if(!ds)return null;
+  const n=new Date();n.setHours(0,0,0,0);const d=new Date(ds);d.setHours(0,0,0,0);
+  return Math.round((d-n)/86400000);
 }
-function typeInfo(type){
+function urgBadge(d){
+  if(d===null)return '';
+  if(d<0)return '<span class="badge b-urgent">Overdue</span>';
+  if(d===0)return '<span class="badge b-urgent">Today</span>';
+  if(d<=3)return '<span class="badge b-urgent">In '+d+'d</span>';
+  if(d<=14)return '<span class="badge b-soon">In '+d+'d</span>';
+  return '<span class="badge b-ok">In '+d+'d</span>';
+}
+function tInfo(type,source){
+  if(source==='google_calendar')return{cls:'i-calendar',icon:'📅'};
   const t=(type||'task').toLowerCase();
-  if(t==='birthday') return {cls:'icon-birthday',icon:'🎂'};
-  if(t==='appointment') return {cls:'icon-appointment',icon:'🏥'};
-  if(t==='recurring') return {cls:'icon-recurring',icon:'🔁'};
-  return {cls:'icon-task',icon:'✓'};
+  if(t==='birthday')return{cls:'i-birthday',icon:'🎂'};
+  if(t==='appointment')return{cls:'i-appointment',icon:'🏥'};
+  if(t==='recurring')return{cls:'i-recurring',icon:'🔁'};
+  return{cls:'i-task',icon:'✓'};
 }
-function formatDate(s){
-  if(!s) return '';
-  return new Date(s).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
-}
+function fmtDate(s){if(!s)return '';return new Date(s+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
 
 async function loadBriefing(){
   const el=document.getElementById('briefing');
   try{
-    const tod=new Date();
-    const h=tod.getHours();
-    const greet=h<12?'morning':h<17?'afternoon':'evening';
-    if(!appData.items.length&&!Object.keys(appData.profile).length){
+    const h=new Date().getHours();const greet=h<12?'morning':h<17?'afternoon':'evening';
+    const combined=allItems();
+    if(!combined.length&&!Object.keys(appData.profile).length){
       el.className='briefing';
-      el.innerHTML=`<div class="briefing-head">Good ${greet}!</div>Head to the <strong>Chat</strong> tab to get started. I'll ask you a few questions to learn about your life.`;
+      el.innerHTML=`<div class="briefing-head">Good ${greet}!</div>Head to <strong>Chat</strong> to get started. I'll learn about your life and keep you on track.`;
       return;
     }
-    const resp=await callClaude(`Write a friendly 2-3 sentence ${greet} briefing for ${tod.toDateString()}. Mention the most urgent items and any upcoming birthdays. Be warm and personal. Flowing sentences, no bullet points.`,false);
+    const resp=await claude(`Write a friendly 2-3 sentence ${greet} briefing for ${new Date().toDateString()}. Reference my Google Calendar events and Tasks where relevant. Mention urgent items and upcoming birthdays. Warm and personal, flowing sentences only.`,false);
     el.className='briefing';
     el.innerHTML=`<div class="briefing-head">Good ${greet}</div>${clean(resp)}`;
-    const urgent=appData.items.filter(i=>i.status!=='done'&&i.dueDate&&daysUntil(i.dueDate)<=14).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+    const urgent=combined.filter(i=>i.status!=='done'&&i.dueDate&&days(i.dueDate)!==null&&days(i.dueDate)<=14).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
     renderUpcoming(urgent);
-  } catch(e){
-    el.className='briefing';el.textContent='Could not load briefing: '+e.message;
-  }
+  }catch(e){el.className='briefing';el.textContent='Could not load briefing: '+e.message;}
 }
 
 function renderUpcoming(items){
   const el=document.getElementById('upcoming-list');
   if(!items.length){el.innerHTML='';return;}
-  el.innerHTML='<div class="section-label">Needs attention</div>'+
-    items.slice(0,8).map(item=>{
-      const {cls,icon}=typeInfo(item.type);
-      const days=daysUntil(item.dueDate);
-      return `<div class="item-card"><div class="item-icon ${cls}">${icon}</div><div style="flex:1;min-width:0"><div class="item-title">${item.title}</div><div class="item-meta">${formatDate(item.dueDate)}${item.recurrence&&item.recurrence!=='none'?' · Repeats '+item.recurrence:''}</div><div class="item-badges">${urgencyBadge(days)}<span class="badge badge-type">${item.type}</span></div></div></div>`;
+  el.innerHTML='<div class="section-label">Needs attention <span class="section-count">next 14 days</span></div>'+
+    items.slice(0,10).map(item=>{
+      const{cls,icon}=tInfo(item.type,item.source);const d=days(item.dueDate);
+      const border=item.source==='google_calendar'?' gcal':item.source==='google_tasks'?' gtask':'';
+      const srcBadge=item.source==='google_calendar'?'<span class="badge b-gcal">Calendar</span>':item.source==='google_tasks'?'<span class="badge b-gtask">Tasks</span>':'';
+      return `<div class="item-card${border}"><div class="item-icon ${cls}">${icon}</div><div style="flex:1;min-width:0"><div class="item-title">${item.title}</div><div class="item-meta">${fmtDate(item.dueDate)}${item.timeStr?' · '+item.timeStr:''}${item.recurrence&&item.recurrence!=='none'?' · Repeats '+item.recurrence:''}</div><div class="item-badges">${urgBadge(d)}${srcBadge}</div></div></div>`;
     }).join('');
 }
 
 function renderAllItems(){
   const el=document.getElementById('all-items-list');
-  const active=appData.items.filter(i=>i.status!=='done').sort((a,b)=>{if(!a.dueDate)return 1;if(!b.dueDate)return -1;return new Date(a.dueDate)-new Date(b.dueDate);});
+  const combined=allItems();
+  const active=combined.filter(i=>i.status!=='done').sort((a,b)=>{if(!a.dueDate)return 1;if(!b.dueDate)return -1;return new Date(a.dueDate)-new Date(b.dueDate);});
   const done=appData.items.filter(i=>i.status==='done');
-  if(!active.length&&!done.length){
-    el.innerHTML='<div class="empty">No items yet.<br>Chat with Claude to add tasks, birthdays, and appointments.</div>';return;
-  }
+  if(!active.length&&!done.length){el.innerHTML='<div class="empty">No items yet.<br>Chat with Claude or check that your Calendar and Tasks synced.</div>';return;}
+  const calItems=active.filter(i=>i.source==='google_calendar');
+  const taskItems=active.filter(i=>i.source==='google_tasks');
+  const myItems=active.filter(i=>i.source!=='google_calendar'&&i.source!=='google_tasks');
   let html='';
-  if(active.length){
-    html+='<div class="section-label">Active ('+active.length+')</div>';
-    html+=active.map(item=>{
-      const {cls,icon}=typeInfo(item.type);
-      const days=item.dueDate?daysUntil(item.dueDate):null;
-      return `<div class="item-card"><div class="item-icon ${cls}">${icon}</div><div style="flex:1;min-width:0"><div class="item-title">${item.title}</div><div class="item-meta">${formatDate(item.dueDate)}${item.recurrence&&item.recurrence!=='none'?' · Repeats '+item.recurrence:''}</div><div class="item-badges">${days!==null?urgencyBadge(days):''}<span class="badge badge-type">${item.priority}</span></div></div></div>`;
-    }).join('');
+  if(calItems.length){
+    html+=`<div class="section-label">Google Calendar <span class="section-count">${calItems.length} events</span></div>`;
+    html+=calItems.map(i=>{const d=days(i.dueDate);return `<div class="item-card gcal"><div class="item-icon i-calendar">📅</div><div style="flex:1;min-width:0"><div class="item-title">${i.title}</div><div class="item-meta">${fmtDate(i.dueDate)}${i.timeStr?' · '+i.timeStr:''}</div><div class="item-badges">${urgBadge(d)}<span class="badge b-gcal">Calendar</span></div></div></div>`;}).join('');
+  }
+  if(taskItems.length){
+    html+=`<div class="section-label">Google Tasks <span class="section-count">${taskItems.length} tasks</span></div>`;
+    html+=taskItems.map(i=>{const d=days(i.dueDate);return `<div class="item-card gtask"><div class="item-icon i-task">✓</div><div style="flex:1;min-width:0"><div class="item-title">${i.title}</div><div class="item-meta">${i.dueDate?fmtDate(i.dueDate):'No due date'}${i.listName?' · '+i.listName:''}</div><div class="item-badges">${d!==null?urgBadge(d):''}<span class="badge b-gtask">Tasks</span></div></div></div>`;}).join('');
+  }
+  if(myItems.length){
+    html+=`<div class="section-label">My items <span class="section-count">${myItems.length}</span></div>`;
+    html+=myItems.map(i=>{const{cls,icon}=tInfo(i.type,i.source);const d=days(i.dueDate);return `<div class="item-card"><div class="item-icon ${cls}">${icon}</div><div style="flex:1;min-width:0"><div class="item-title">${i.title}</div><div class="item-meta">${fmtDate(i.dueDate)}${i.recurrence&&i.recurrence!=='none'?' · Repeats '+i.recurrence:''}</div><div class="item-badges">${d!==null?urgBadge(d):''}<span class="badge b-type">${i.priority||'medium'}</span></div></div></div>`;}).join('');
   }
   if(done.length){
-    html+='<div class="section-label">Done ('+done.length+')</div>';
-    html+=done.map(item=>`<div class="item-card" style="opacity:.45"><div class="item-icon ${typeInfo(item.type).cls}">${typeInfo(item.type).icon}</div><div style="flex:1"><div class="item-title" style="text-decoration:line-through">${item.title}</div></div></div>`).join('');
+    html+=`<div class="section-label">Completed <span class="section-count">${done.length}</span></div>`;
+    html+=done.map(i=>`<div class="item-card" style="opacity:.4"><div class="item-icon ${tInfo(i.type).cls}">${tInfo(i.type).icon}</div><div style="flex:1"><div class="item-title" style="text-decoration:line-through">${i.title}</div></div></div>`).join('');
   }
   el.innerHTML=html;
 }
@@ -461,102 +441,71 @@ function renderAllItems(){
 function renderProfile(){
   const el=document.getElementById('profile-view');
   const p=appData.profile;const ppl=appData.people||[];const mem=appData.memoryLog||[];
-  let html='';
-  if(Object.keys(p).length){
-    html+=`<div class="profile-card"><h4>About you</h4>${Object.entries(p).map(([k,v])=>`<div class="pkv"><span class="pk">${k}</span><span class="pv">${v}</span></div>`).join('')}</div>`;
-  }
-  if(ppl.length){
-    html+=`<div class="profile-card"><h4>People (${ppl.length})</h4>${ppl.map(p=>`<div class="pkv"><span class="pk">${p.name} <span style="color:#ccc;font-size:11px">${p.relationship}</span></span><span class="pv">${p.birthday?formatDate(p.birthday):''}</span></div>`).join('')}</div>`;
-  }
-  if(mem.length){
-    html+=`<div class="profile-card"><h4>What I know (${mem.length} memories)</h4>${mem.slice(-12).reverse().map(m=>`<div class="pkv"><span class="pk" style="color:#888;max-width:100%">${m.learned}</span></div>`).join('')}</div>`;
-  }
-  if(!html) html='<div class="empty">No profile yet.<br>Start chatting to build your profile.</div>';
+  let html=`<div class="profile-card"><h4>Data sources</h4>
+    <div class="pkv"><span class="pk">Google Sheets</span><span class="pv">${appData.items.length} items stored</span></div>
+    <div class="pkv"><span class="pk">Google Calendar</span><span class="pv">${syncSt.calendar==='ok'?syncSt.calCount+' events':'Not synced'}</span></div>
+    <div class="pkv"><span class="pk">Google Tasks</span><span class="pv">${syncSt.tasks==='ok'?syncSt.taskCount+' tasks':'Not synced'}</span></div>
+    <div class="pkv"><span class="pk">Memories</span><span class="pv">${mem.length} facts</span></div>
+  </div>`;
+  if(Object.keys(p).length)html+=`<div class="profile-card"><h4>About you</h4>${Object.entries(p).map(([k,v])=>`<div class="pkv"><span class="pk">${k}</span><span class="pv">${v}</span></div>`).join('')}</div>`;
+  if(ppl.length)html+=`<div class="profile-card"><h4>People (${ppl.length})</h4>${ppl.map(p=>`<div class="pkv"><span class="pk">${p.name} <span style="color:#ccc;font-size:11px">${p.relationship}</span></span><span class="pv">${p.birthday?fmtDate(p.birthday):''}</span></div>`).join('')}</div>`;
+  if(mem.length)html+=`<div class="profile-card"><h4>What I know (${mem.length} memories)</h4>${mem.slice(-12).reverse().map(m=>`<div class="pkv"><span class="pk" style="color:#888;max-width:100%">${m.learned}</span></div>`).join('')}</div>`;
   el.innerHTML=html;
 }
 
-// ── CHAT ───────────────────────────────────────────────
 function addBubble(text,role,thinking=false){
   const wrap=document.getElementById('chat-messages');
-  const div=document.createElement('div');
-  div.className=`bubble ${role}${thinking?' thinking':''}`;
-  div.textContent=text;
-  wrap.appendChild(div);
-  wrap.scrollTop=wrap.scrollHeight;
-  return div;
+  const div=document.createElement('div');div.className=`bubble ${role}${thinking?' thinking':''}`;div.textContent=text;
+  wrap.appendChild(div);wrap.scrollTop=wrap.scrollHeight;return div;
 }
 
 async function sendMessage(){
-  const inp=document.getElementById('chat-input');
-  const msg=inp.value.trim();
-  if(!msg) return;
-  inp.value='';
-  document.getElementById('send-btn').disabled=true;
-  addBubble(msg,'user');
-  const thinking=addBubble('Thinking...','ai',true);
+  const inp=document.getElementById('chat-input');const msg=inp.value.trim();if(!msg)return;
+  inp.value='';document.getElementById('send-btn').disabled=true;
+  addBubble(msg,'user');const thinking=addBubble('Thinking...','ai',true);
   try{
-    const resp=await callClaude(msg);
-    await processActions(resp);
-    thinking.remove();
-    addBubble(clean(resp),'ai');
-    renderAllItems();renderProfile();
-    const urgent=appData.items.filter(i=>i.status!=='done'&&i.dueDate&&daysUntil(i.dueDate)<=14).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
+    const resp=await claude(msg);await runActions(resp);thinking.remove();
+    addBubble(clean(resp),'ai');renderAllItems();renderProfile();
+    const urgent=allItems().filter(i=>i.status!=='done'&&i.dueDate&&days(i.dueDate)!==null&&days(i.dueDate)<=14).sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate));
     renderUpcoming(urgent);
-  } catch(e){
-    thinking.remove();
-    addBubble('Sorry, something went wrong: '+e.message,'ai');
-  }
-  document.getElementById('send-btn').disabled=false;
-  inp.focus();
+  }catch(e){thinking.remove();addBubble('Sorry, something went wrong: '+e.message,'ai');}
+  document.getElementById('send-btn').disabled=false;inp.focus();
 }
 
-// ── SETUP & NAV ────────────────────────────────────────
 async function startSetup(){
-  const btn=document.getElementById('setup-btn');
-  const err=document.getElementById('setup-error');
+  const btn=document.getElementById('setup-btn');const err=document.getElementById('setup-error');
   err.style.display='none';
   cfg.sheetId=document.getElementById('cfg-sheet').value.trim();
   cfg.clientId=document.getElementById('cfg-client-id').value.trim();
   cfg.secret=document.getElementById('cfg-secret').value.trim();
   cfg.refresh=document.getElementById('cfg-refresh').value.trim();
   cfg.anthropic=document.getElementById('cfg-anthropic').value.trim();
-  if(!cfg.sheetId||!cfg.clientId||!cfg.secret||!cfg.refresh||!cfg.anthropic){
-    err.textContent='Please fill in all fields.';err.style.display='block';return;
-  }
+  if(!cfg.sheetId||!cfg.clientId||!cfg.secret||!cfg.refresh||!cfg.anthropic){err.textContent='Please fill in all fields.';err.style.display='block';return;}
   btn.disabled=true;btn.textContent='Connecting...';
   try{
-    await initSheets();
-    await loadAllData();
-    showScreen('app');
+    btn.textContent='Setting up sheets...';await initSheets();await loadData();
+    showScreen('app');updateSyncBar();
+    btn.textContent='Syncing calendar & tasks...';
+    await Promise.all([syncCalendar(),syncTasks()]);
     loadBriefing();
-    // Warm greeting in chat
-    const greet=await callClaude('Hello! I just opened the app.');
-    await processActions(greet);
-    addBubble(clean(greet),'ai');
-  } catch(e){
-    err.textContent='Connection failed: '+e.message;
-    err.style.display='block';
-    btn.disabled=false;btn.textContent='Connect & Start →';
+    const greet=await claude('Hello! I just opened the app. My Google Calendar and Tasks are now synced in addition to my Sheets data.');
+    await runActions(greet);addBubble(clean(greet),'ai');
+  }catch(e){
+    if(document.getElementById('screen-setup').classList.contains('active')){err.textContent='Connection failed: '+e.message;err.style.display='block';}
+    else addBubble('Error: '+e.message,'ai');
+    btn.disabled=false;btn.textContent='Connect & Sync →';
   }
 }
 
-function showScreen(name){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('screen-'+name).classList.add('active');
-}
+function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('screen-'+name).classList.add('active');}
 
 function switchTab(name){
-  document.querySelectorAll('.nav-tab').forEach((t,i)=>{
-    t.classList.toggle('active',['today','chat','items','profile'][i]===name);
-  });
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>t.classList.toggle('active',['today','chat','items','profile'][i]===name));
   document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');
   document.getElementById('tab-'+name).style.display='block';
-  if(name==='items') renderAllItems();
-  if(name==='profile') renderProfile();
-  if(name==='chat'){
-    const w=document.getElementById('chat-messages');w.scrollTop=w.scrollHeight;
-    document.getElementById('chat-input').focus();
-  }
+  if(name==='items')renderAllItems();
+  if(name==='profile')renderProfile();
+  if(name==='chat'){const w=document.getElementById('chat-messages');w.scrollTop=w.scrollHeight;document.getElementById('chat-input').focus();}
 }
 </script>
 </body>
